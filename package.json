@@ -1,5 +1,5 @@
 {
-  "name": "readable-expression",
+  "name": "readable-expressions",
   "version": "1.0.0",
   "description": "Build regular expressions in a safe and readable way.",
   "keywords": [
