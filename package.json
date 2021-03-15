@@ -30,7 +30,7 @@
     "clean": "rimraf dist",
     "clean:reason": "bsb -clean-world",
     "build:reason": "bsb -make-world",
-    "build:rollup": "rollup -c",
+    "build:esbuild": "node esbuild.js",
     "build": "run-s build:*",
     "prepack": "npm-run-all -s clean build",
     "test": "jest --coverage"
