@@ -1,0 +1,11 @@
+node_modules
+npm-packages-offline-cache
+dist
+coverage
+lib
+.merlin
+.idea
+*.log
+.env
+.npmrc
+

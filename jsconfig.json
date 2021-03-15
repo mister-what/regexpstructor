@@ -1,0 +1,6 @@
+{
+  "include": ["./src/**/*.js"],
+  "compilerOptions": {
+    "lib": ["esnext", "es2020", "dom"]
+  }
+}

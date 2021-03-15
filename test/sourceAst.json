@@ -1,0 +1,105 @@
+{
+  "TAG": 1,
+  "left": {
+    "TAG": 1,
+    "left": {
+      "TAG": 1,
+      "left": {
+        "TAG": 0,
+        "_0": {
+          "TAG": 0,
+          "_0": "Hello"
+        }
+      },
+      "right": {
+        "TAG": 2,
+        "node": {
+          "TAG": 1,
+          "left": {
+            "TAG": 0,
+            "_0": {
+              "TAG": 0,
+              "_0": "\\s"
+            }
+          },
+          "right": {
+            "TAG": 1,
+            "left": {
+              "TAG": 1,
+              "left": {
+                "TAG": 1,
+                "left": {
+                  "TAG": 0,
+                  "_0": {
+                    "TAG": 0,
+                    "_0": "\\r"
+                  }
+                },
+                "right": {
+                  "TAG": 0,
+                  "_0": {
+                    "TAG": 0,
+                    "_0": "\\n"
+                  }
+                },
+                "kind": "Conjunction"
+              },
+              "right": {
+                "TAG": 0,
+                "_0": {
+                  "TAG": 0,
+                  "_0": "\\r"
+                }
+              },
+              "kind": "Disjunction"
+            },
+            "right": {
+              "TAG": 0,
+              "_0": {
+                "TAG": 0,
+                "_0": "\\n"
+              }
+            },
+            "kind": "Disjunction"
+          },
+          "kind": "Conjunction"
+        },
+        "kind": "ZeroOrOne"
+      },
+      "kind": "Conjunction"
+    },
+    "right": {
+      "TAG": 1,
+      "left": {
+        "TAG": 0,
+        "_0": {
+          "TAG": 0,
+          "_0": "World"
+        }
+      },
+      "right": {
+        "TAG": 0,
+        "_0": {
+          "TAG": 0,
+          "_0": "world"
+        }
+      },
+      "kind": "Disjunction"
+    },
+    "kind": "Conjunction"
+  },
+  "right": {
+    "TAG": 0,
+    "_0": {
+      "TAG": 1,
+      "chars": [
+        {
+          "NAME": "Chars",
+          "VAL": "!?."
+        }
+      ],
+      "negative": false
+    }
+  },
+  "kind": "Conjunction"
+}
