@@ -1,0 +1,36 @@
+name: Semantic Release
+on:
+  repository_dispatch:
+    types: [semantic-release]
+  workflow_dispatch:
+
+  push:
+    branches:
+      - main
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Cache yarn-offline-mirror
+        uses: actions/cache@v2
+        env:
+          cache-name: yarn-offline-mirror
+        with:
+          path: ./npm-packages-offline-cache
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('./yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 15
+      - run: npm i -g yarn
+      - run: yarn --frozen-lockfile
+      - env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: yarn run semantic-release
