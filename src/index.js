@@ -1,3 +1,3 @@
-import ReadExp from "./ReadableExpression";
-// export default ReadExp;
-module.exports = ReadExp;
+import ReStructor from "./RegExpstructor";
+// export default ReStructor;
+module.exports = ReStructor;

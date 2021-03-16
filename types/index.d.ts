@@ -1,2 +1,2 @@
-import ReadExp from "./ReadableExpression";
-export = ReadExp;
+import ReStructor from "./RegExpstructor";
+export = ReStructor;

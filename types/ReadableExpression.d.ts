@@ -14,223 +14,223 @@ type RootNode<T> = {
  * @typedef {{prefix?: string, suffix?: string, node: Node, flags?: string }} RootNode
  */
 /**
- * @class ReadableExpression
- * @namespace ReadableExpression
+ * @class RegExpstructor
+ * @namespace RegExpstructor
  */
-interface ReadableExpression {
+interface RegExpstructor {
   /**
    * @description Control start-of-line matching
    * @param {boolean} [enable=true] whether to enable this behaviour
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
-  assertStartOfLine(enable?: boolean): ReadableExpression;
+  assertStartOfLine(enable?: boolean): RegExpstructor;
   /**
    * @description Control end-of-line matching
    * @param {boolean} [enable=true] whether to enable this behaviour
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
-  assertEndOfLine(enable?: boolean): ReadableExpression;
+  assertEndOfLine(enable?: boolean): RegExpstructor;
   /**
    * @description Look for the value passed
-   * @param {(string|RegExp|number|ReadableExpression)} value value to find
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @param {(string|RegExp|number|RegExpstructor)} value value to find
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
   then(
-    value: string | RegExp | number | ReadableExpression
-  ): ReadableExpression;
+    value: string | RegExp | number | RegExpstructor
+  ): RegExpstructor;
   /**
    * @description Add an optional branch for matching
-   * @param {(string|RegExp|number|ReadableExpression)} value value to find
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @param {(string|RegExp|number|RegExpstructor)} value value to find
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
   maybe(
-    value: string | RegExp | number | ReadableExpression
-  ): ReadableExpression;
+    value: string | RegExp | number | RegExpstructor
+  ): RegExpstructor;
   /**
    * @description Add alternative expressions
-   * @param {(string|RegExp|number|ReadableExpression)} value value to find
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @param {(string|RegExp|number|RegExpstructor)} value value to find
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
-  or(value: string | RegExp | number | ReadableExpression): ReadableExpression;
+  or(value: string | RegExp | number | RegExpstructor): RegExpstructor;
   /**
    * @description Any character any number of times
    * @param {boolean} [lazy] match least number of characters
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
-  anything(lazy?: boolean): ReadableExpression;
+  anything(lazy?: boolean): RegExpstructor;
   /**
    * @description Anything but these characters
    * @param {(string|number|string[]|number[])} value characters to not match
    * @param {boolean} [lazy] match least number of characters
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
   anythingBut(
     value: string | number | string[] | number[],
     lazy?: boolean
-  ): ReadableExpression;
+  ): RegExpstructor;
   /**
    * @description Any character(s) at least once
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
-  something(): ReadableExpression;
+  something(): RegExpstructor;
   /**
    * @description Any character at least one time except for these characters
    * @param {(string|number|string[]|number[])} value characters to not match
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
   somethingBut(
     value: string | number | string[] | number[]
-  ): ReadableExpression;
+  ): RegExpstructor;
   /**
    * @description Match any of the given characters
    * @param {(string|number|string[]|number[])} value characters to match
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
-  anyOf(value: string | number | string[] | number[]): ReadableExpression;
+  anyOf(value: string | number | string[] | number[]): RegExpstructor;
   /**
    * @description Match some of the given characters
    * @param {(string|number|string[]|number[])} value characters to match
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
-  someOf(value: string | number | string[] | number[]): ReadableExpression;
+  someOf(value: string | number | string[] | number[]): RegExpstructor;
   /**
    * @description Match one chartacter of the given characters
    * @param {(string|number|string[]|number[])} value characters to match
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
-  oneOf(value: string | number | string[] | number[]): ReadableExpression;
+  oneOf(value: string | number | string[] | number[]): RegExpstructor;
   /**
    * @description Shorthand for anyOf(value)
    * @param {string|number} value value to find
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
-  any(value: string | number): ReadableExpression;
+  any(value: string | number): RegExpstructor;
   /**
    * @description Ensure that the parameter does not follow (negative lookahead)
-   * @param {string|number|RegExp|ReadableExpression} value
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @param {string|number|RegExp|RegExpstructor} value
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
   assertNotFollowedBy(
-    value: string | number | RegExp | ReadableExpression
-  ): ReadableExpression;
+    value: string | number | RegExp | RegExpstructor
+  ): RegExpstructor;
   notFollowedBy(
-    value: string | number | RegExp | ReadableExpression
-  ): ReadableExpression;
+    value: string | number | RegExp | RegExpstructor
+  ): RegExpstructor;
   /**
    * @description Ensure that the parameter does follow (positive lookahead)
-   * @param {string|number|RegExp|ReadableExpression} value
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @param {string|number|RegExp|RegExpstructor} value
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
   assertFollowedBy(
-    value: string | number | RegExp | ReadableExpression
-  ): ReadableExpression;
+    value: string | number | RegExp | RegExpstructor
+  ): RegExpstructor;
   followedBy(
-    value: string | number | RegExp | ReadableExpression
-  ): ReadableExpression;
+    value: string | number | RegExp | RegExpstructor
+  ): RegExpstructor;
   /**
    * @description Match any character in these ranges
-   * @example ReadableExpression.empty.charOfRanges(["a","z"], ["0", "9"]) // [a-z0-9]
+   * @example RegExpstructor.empty.charOfRanges(["a","z"], ["0", "9"]) // [a-z0-9]
    * @param {...([string, string])} characterRanges total number of elements must be event
-   * @returns {ReadableExpression}
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor}
+   * @memberOf RegExpstructor#
    */
-  charOfRanges(...characterRanges: [string, string][]): ReadableExpression;
+  charOfRanges(...characterRanges: [string, string][]): RegExpstructor;
   /**
    * @description Match any character that is not in these ranges
-   * @example ReadableExpression.empty.charNotOfRanges(["a","z"], ["0", "9"]) // [^a-z0-9]
+   * @example RegExpstructor.empty.charNotOfRanges(["a","z"], ["0", "9"]) // [^a-z0-9]
    * @param {...([string, string])} characterRanges total number of elements must be event
-   * @returns {ReadableExpression}
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor}
+   * @memberOf RegExpstructor#
    */
-  charNotOfRanges(...characterRanges: [string, string][]): ReadableExpression;
+  charNotOfRanges(...characterRanges: [string, string][]): RegExpstructor;
   /**
    * @description Match a Line break
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
-  lineBreak(): ReadableExpression;
+  lineBreak(): RegExpstructor;
   /**
    * @description A shorthand for lineBreak() for html-minded users
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
-  br(): ReadableExpression;
+  br(): RegExpstructor;
   /**
    * @description Match a tab character
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
-  tab(): ReadableExpression;
+  tab(): RegExpstructor;
   /**
    * @description Match any alphanumeric sequence
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
-  word(): ReadableExpression;
+  word(): RegExpstructor;
   /**
    * @description Match a single digit
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
-  digit(): ReadableExpression;
+  digit(): RegExpstructor;
   /**
    * @description Match a single whitespace
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
-  whitespace(): ReadableExpression;
+  whitespace(): RegExpstructor;
   /**
    * @description Add a regex flag - default flags are: "gi"
    * @param {string} flag
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
-  addFlag(flag?: string): ReadableExpression;
+  addFlag(flag?: string): RegExpstructor;
   /**
    * @description Remove a regex flag - default flags are: "gi"
    * @param {string} flag
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
-  removeFlag(flag: string): ReadableExpression;
+  removeFlag(flag: string): RegExpstructor;
   /**
    * @description Adds an "i" regex flag - default flags are: "gi"
    * @param {boolean=true} enable
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
-  withAnyCase(enable?: boolean): ReadableExpression;
+  withAnyCase(enable?: boolean): RegExpstructor;
   /**
    * @description Removes a "g" regex flag - default flags are: "gi"
    * @param {boolean=true} enable `true` means no "g" flag
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
-  stopAtFirst(enable?: boolean): ReadableExpression;
-  global(enable?: boolean): ReadableExpression;
-  toggleFlag(flag: string): ReadableExpression;
+  stopAtFirst(enable?: boolean): RegExpstructor;
+  global(enable?: boolean): RegExpstructor;
+  toggleFlag(flag: string): RegExpstructor;
   /**
    * @description Removes any set "m" regex flag - default flags are: "gi"
    * @param {boolean=true} enable `true` means "m" flag will be removed
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
-  searchOneLine(enable?: boolean): ReadableExpression;
+  searchOneLine(enable?: boolean): RegExpstructor;
   /**
    * @description match the expression <min> to <max> times
    * @example ```js
@@ -238,125 +238,125 @@ interface ReadableExpression {
    * ```
    * @param {number} min
    * @param {number} max
-   * @returns {ReadableExpression}
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor}
+   * @memberOf RegExpstructor#
    */
-  repeat(min: number, max: number): ReadableExpression;
+  repeat(min: number, max: number): RegExpstructor;
   /**
    * @description match the expression exactly <n> times
    * @example ```js
    * Sx("abc").whitespace().repeatExactly(5).compile().toString() === /(?:abc\w){5}/gm.toString()
    * ```
    * @param {number} n must be > 0
-   * @returns {ReadableExpression}
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor}
+   * @memberOf RegExpstructor#
    */
-  repeatExactly(n: number): ReadableExpression;
+  repeatExactly(n: number): RegExpstructor;
   /**
    * @description the expression should match at least once
-   * @returns {ReadableExpression}
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor}
+   * @memberOf RegExpstructor#
    */
-  oneOrMore(): ReadableExpression;
+  oneOrMore(): RegExpstructor;
   /**
    * @description the expression should match zero or more times
    * @param {boolean} [lazy] enable lazy (non greedy) matching
-   * @returns {ReadableExpression}
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor}
+   * @memberOf RegExpstructor#
    */
-  zeroOrMore(lazy?: boolean): ReadableExpression;
+  zeroOrMore(lazy?: boolean): RegExpstructor;
   /**
    *
    * @param {string} [name] optionally name your capturing group
-   * @returns {ReadableExpression}
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor}
+   * @memberOf RegExpstructor#
    */
-  capture(name?: string): ReadableExpression;
-  group(name?: string): ReadableExpression;
+  capture(name?: string): RegExpstructor;
+  group(name?: string): RegExpstructor;
   /**
-   * @description compile the ReadExpession to a RegExp
+   * @description compile the ReStructoression to a RegExp
    * @returns {RegExp}
-   * @memberOf ReadableExpression#
+   * @memberOf RegExpstructor#
    */
   compile(): RegExp;
 }
-type ReadablePrimitive = ReadableExpression;
+type ReadablePrimitive = RegExpstructor;
 
-interface ReadableExpressionConstructor {
+interface RegExpstructorConstructor {
   new (
-    value: string | number | RegExp | ReadableExpression
-  ): ReadableExpression;
+    value: string | number | RegExp | RegExpstructor
+  ): RegExpstructor;
   /**
    *
-   * @param {string|number|RegExp|ReadableExpression} [value]
-   * @returns {ReadableExpression}
+   * @param {string|number|RegExp|RegExpstructor} [value]
+   * @returns {RegExpstructor}
    */
-  (value: string | number | RegExp | ReadableExpression): ReadableExpression;
-  prototype: ReadableExpression;
+  (value: string | number | RegExp | RegExpstructor): RegExpstructor;
+  prototype: RegExpstructor;
 
   /**
-   * @description creates ReadExps from a variety of source formats
-   * @param {String|Number|RegExp|ReadableExpression} x
-   * @returns {ReadableExpression}
-   * @memberOf ReadableExpression
+   * @description creates ReStructors from a variety of source formats
+   * @param {String|Number|RegExp|RegExpstructor} x
+   * @returns {RegExpstructor}
+   * @memberOf RegExpstructor
    */
-  of(x: string | number | RegExp | ReadableExpression): ReadableExpression;
+  of(x: string | number | RegExp | RegExpstructor): RegExpstructor;
   /**
    * @description disjunction (one must match) between the argument expressions
-   * @param {...(String|Number|RegExp|ReadableExpression)} xs
-   * @returns {ReadableExpression}
-   * @memberOf ReadableExpression
+   * @param {...(String|Number|RegExp|RegExpstructor)} xs
+   * @returns {RegExpstructor}
+   * @memberOf RegExpstructor
    */
   or(
-    ...xs: (string | number | RegExp | ReadableExpression)[]
-  ): ReadableExpression;
+    ...xs: (string | number | RegExp | RegExpstructor)[]
+  ): RegExpstructor;
   /**
    * @description conjunction (all must match) of the argument expressions
-   * @param {...(String|Number|RegExp|ReadableExpression)} xs
-   * @returns {ReadableExpression}
-   * @memberOf ReadableExpression
+   * @param {...(String|Number|RegExp|RegExpstructor)} xs
+   * @returns {RegExpstructor}
+   * @memberOf RegExpstructor
    */
   seq(
-    ...xs: (string | number | RegExp | ReadableExpression)[]
-  ): ReadableExpression;
+    ...xs: (string | number | RegExp | RegExpstructor)[]
+  ): RegExpstructor;
   /**
-   * @description a ReadExp that matches a whitespace
+   * @description a ReStructor that matches a whitespace
    * @type {ReadablePrimitive}
-   * @memberOf ReadableExpression
+   * @memberOf RegExpstructor
    */
   whitespace: ReadablePrimitive;
   /**
-   * @description an empty ReadExp
+   * @description an empty ReStructor
    * @type {ReadablePrimitive}
-   * @memberOf ReadableExpression
+   * @memberOf RegExpstructor
    */
   empty: ReadablePrimitive;
   /**
    * @description match one digit
    * @type {ReadablePrimitive}
-   * @memberOf ReadableExpression
+   * @memberOf RegExpstructor
    */
   digit: ReadablePrimitive;
   /**
    * @description match a tab-character
    * @type {ReadablePrimitive}
-   * @memberOf ReadableExpression
+   * @memberOf RegExpstructor
    */
   tab: ReadablePrimitive;
   /**
    * @description matches a whole word
    * @type {ReadablePrimitive}
-   * @memberOf ReadableExpression
+   * @memberOf RegExpstructor
    */
   word: ReadablePrimitive;
   /**
    * @description match any kind of line break or new-lines
    * @type {ReadablePrimitive}
-   * @memberOf ReadableExpression
+   * @memberOf RegExpstructor
    */
   linebreak: ReadablePrimitive;
   any: ReadablePrimitive;
 }
-declare var ReadExp: ReadableExpressionConstructor;
+declare var ReStructor: RegExpstructorConstructor;
 
-export default ReadExp;
+export default ReStructor;

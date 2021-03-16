@@ -83,7 +83,7 @@ const isInstanceOfExisting = (obj) =>
 
 const isInstance = (obj) => {
   if (obj == null) return false;
-  return obj instanceof ReadableExpression || isInstanceOfExisting(obj);
+  return obj instanceof RegExpstructor || isInstanceOfExisting(obj);
 };
 
 /**
@@ -92,15 +92,15 @@ const isInstance = (obj) => {
  * @typedef {{prefix?: string, suffix?: string, node: Node, flags?: string }} RootNode
  */
 /**
- * @class ReadableExpression
- * @namespace ReadableExpression
+ * @class RegExpstructor
+ * @namespace RegExpstructor
  */
-class ReadableExpression {
+class RegExpstructor {
   #rootNode;
   /**
-   * @description Creates an instance of ReadableExpression.
+   * @description Creates an instance of RegExpstructor.
    * @constructor
-   * @memberOf ReadableExpression
+   * @memberOf RegExpstructor
    *
    * @param {{
    *   source?:string,
@@ -128,7 +128,7 @@ class ReadableExpression {
 
   static #getRootNode = (x) => {
     if (!isInstance(x))
-      throw new Error(`${x} is not an instance of ReadableExpression`);
+      throw new Error(`${x} is not an instance of RegExpstructor`);
     function _getNode() {
       // noinspection JSPotentiallyInvalidUsageOfClassThis
       return this.#rootNode;
@@ -137,20 +137,20 @@ class ReadableExpression {
   };
 
   /**
-   * @description creates a ReadExp from a rootNode type
+   * @description creates a ReStructor from a rootNode type
    * @param {RootNode} node
-   * @returns {ReadableExpression}
-   * @memberOf ReadableExpression
+   * @returns {RegExpstructor}
+   * @memberOf RegExpstructor
    */
   static from(node) {
     return new this(node);
   }
 
   /**
-   * @description creates ReadExps from a variety of source formats
-   * @param {String|Number|RegExp|ReadableExpression} x
-   * @returns {ReadableExpression}
-   * @memberOf ReadableExpression
+   * @description creates ReStructors from a variety of source formats
+   * @param {String|Number|RegExp|RegExpstructor} x
+   * @returns {RegExpstructor}
+   * @memberOf RegExpstructor
    */
   static of(x) {
     if (x instanceof this) {
@@ -165,14 +165,14 @@ class ReadableExpression {
 
   /**
    * @description disjunction (one must match) between the argument expressions
-   * @param {...(String|Number|RegExp|ReadableExpression)} xs
-   * @returns {ReadableExpression}
-   * @memberOf ReadableExpression
+   * @param {...(String|Number|RegExp|RegExpstructor)} xs
+   * @returns {RegExpstructor}
+   * @memberOf RegExpstructor
    */
   static or(...xs) {
     const verbals = xs.map((x) => {
       if (isInstance(x)) return x;
-      return ReadableExpression.of(x);
+      return RegExpstructor.of(x);
     });
 
     const nodes = verbals.map((x) => this.#getRootNode(x).node);
@@ -181,57 +181,57 @@ class ReadableExpression {
 
   /**
    * @description conjunction (all must match) of the argument expressions
-   * @param {...(String|Number|RegExp|ReadableExpression)} xs
-   * @returns {ReadableExpression}
-   * @memberOf ReadableExpression
+   * @param {...(String|Number|RegExp|RegExpstructor)} xs
+   * @returns {RegExpstructor}
+   * @memberOf RegExpstructor
    */
   static seq(...xs) {
-    const verbals = xs.map((x) => ReadableExpression.of(x));
+    const verbals = xs.map((x) => RegExpstructor.of(x));
     const nodes = verbals.map((x) => this.#getRootNode(x).node);
     return this.from({ node: seq(nodes) });
   }
 
   /**
-   * @description Alias for a class of primitive ReadableExpressions (usually used as building blocks for more complex ReadExps)
-   * @typedef {ReadableExpression} ReadablePrimitive
+   * @description Alias for a class of primitive RegExpstructors (usually used as building blocks for more complex ReStructors)
+   * @typedef {RegExpstructor} ReadablePrimitive
    */
   /**
-   * @description a ReadExp that matches a whitespace
+   * @description a ReStructor that matches a whitespace
    * @type {ReadablePrimitive}
-   * @memberOf ReadableExpression
+   * @memberOf RegExpstructor
    */
-  static whitespace = new ReadableExpression({ node: whitespace });
+  static whitespace = new RegExpstructor({ node: whitespace });
   /**
-   * @description an empty ReadExp
+   * @description an empty ReStructor
    * @type {ReadablePrimitive}
-   * @memberOf ReadableExpression
+   * @memberOf RegExpstructor
    */
-  static empty = new ReadableExpression({ node: empty });
+  static empty = new RegExpstructor({ node: empty });
   /**
    * @description match one digit
    * @type {ReadablePrimitive}
-   * @memberOf ReadableExpression
+   * @memberOf RegExpstructor
    */
-  static digit = new ReadableExpression({ node: digit });
+  static digit = new RegExpstructor({ node: digit });
   /**
    * @description match a tab-character
    * @type {ReadablePrimitive}
-   * @memberOf ReadableExpression
+   * @memberOf RegExpstructor
    */
-  static tab = new ReadableExpression({ node: tab });
+  static tab = new RegExpstructor({ node: tab });
   /**
    * @description matches a whole word
    * @type {ReadablePrimitive}
-   * @memberOf ReadableExpression
+   * @memberOf RegExpstructor
    */
-  static word = new ReadableExpression({ node: word });
+  static word = new RegExpstructor({ node: word });
   /**
    * @description match any kind of line break or new-lines
    * @type {ReadablePrimitive}
-   * @memberOf ReadableExpression
+   * @memberOf RegExpstructor
    */
-  static linebreak = new ReadableExpression({ node: linebreak });
-  static any = new ReadableExpression({ node: something(empty) });
+  static linebreak = new RegExpstructor({ node: linebreak });
+  static any = new RegExpstructor({ node: something(empty) });
 
   // Utility //
 
@@ -264,12 +264,12 @@ class ReadableExpression {
   };
 
   #setPrefix = (prefix) => {
-    const newInstance = new ReadableExpression(null, false);
+    const newInstance = new RegExpstructor(null, false);
     newInstance.#rootNode = setPrefix(this.#rootNode, prefix);
     return newInstance;
   };
   #setSuffix = (suffix) => {
-    const newInstance = new ReadableExpression(null, false);
+    const newInstance = new RegExpstructor(null, false);
     newInstance.#rootNode = setSuffix(this.#rootNode, suffix);
     return newInstance;
   };
@@ -279,8 +279,8 @@ class ReadableExpression {
   /**
    * @description Control start-of-line matching
    * @param {boolean} [enable=true] whether to enable this behaviour
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
   assertStartOfLine(enable = true) {
     return this.#setPrefix(enable ? "^" : "");
@@ -289,8 +289,8 @@ class ReadableExpression {
   /**
    * @description Control end-of-line matching
    * @param {boolean} [enable=true] whether to enable this behaviour
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
   assertEndOfLine(enable = true) {
     return this.#setSuffix(enable ? "$" : "");
@@ -298,17 +298,17 @@ class ReadableExpression {
 
   /**
    * @description Look for the value passed
-   * @param {(string|RegExp|number|ReadableExpression)} value value to find
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @param {(string|RegExp|number|RegExpstructor)} value value to find
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
   then(value) {
-    return ReadableExpression.from(
+    return RegExpstructor.from(
       setNode(
         setSuffix(this.#rootNode, ""),
         then_(
           getNode(this.#rootNode),
-          ReadableExpression.of(value).#rootNode.node
+          RegExpstructor.of(value).#rootNode.node
         )
       )
     );
@@ -316,17 +316,17 @@ class ReadableExpression {
 
   /**
    * @description Add an optional branch for matching
-   * @param {(string|RegExp|number|ReadableExpression)} value value to find
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @param {(string|RegExp|number|RegExpstructor)} value value to find
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
   maybe(value) {
-    return ReadableExpression.from(
+    return RegExpstructor.from(
       setNode(
         setSuffix(this.#rootNode, ""),
         maybe(
           getNode(this.#rootNode),
-          ReadableExpression.of(value).#rootNode.node
+          RegExpstructor.of(value).#rootNode.node
         )
       )
     );
@@ -334,17 +334,17 @@ class ReadableExpression {
 
   /**
    * @description Add alternative expressions
-   * @param {(string|RegExp|number|ReadableExpression)} value value to find
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @param {(string|RegExp|number|RegExpstructor)} value value to find
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
   or(value) {
-    return ReadableExpression.from(
+    return RegExpstructor.from(
       setNode(
         this.#rootNode,
         or_(
           getNode(this.#rootNode),
-          ReadableExpression.of(value).#rootNode.node
+          RegExpstructor.of(value).#rootNode.node
         )
       )
     );
@@ -353,11 +353,11 @@ class ReadableExpression {
   /**
    * @description Any character any number of times
    * @param {boolean} [lazy] match least number of characters
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
   anything(lazy = false) {
-    return ReadableExpression.from(
+    return RegExpstructor.from(
       setNode(this.#rootNode, anything(getNode(this.#rootNode), lazy))
     );
   }
@@ -366,11 +366,11 @@ class ReadableExpression {
    * @description Anything but these characters
    * @param {(string|number|string[]|number[])} value characters to not match
    * @param {boolean} [lazy] match least number of characters
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
   anythingBut(value, lazy = false) {
-    return ReadableExpression.from(
+    return RegExpstructor.from(
       setNode(
         this.#rootNode,
         anythingBut(getNode(this.#rootNode), [value].flat().join(""), lazy)
@@ -380,11 +380,11 @@ class ReadableExpression {
 
   /**
    * @description Any character(s) at least once
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
   something() {
-    return ReadableExpression.from(
+    return RegExpstructor.from(
       setNode(this.#rootNode, something(getNode(this.#rootNode)))
     );
   }
@@ -392,11 +392,11 @@ class ReadableExpression {
   /**
    * @description Any character at least one time except for these characters
    * @param {(string|number|string[]|number[])} value characters to not match
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
   somethingBut(value) {
-    return ReadableExpression.from(
+    return RegExpstructor.from(
       setNode(
         this.#rootNode,
         somethingBut(getNode(this.#rootNode), [value].flat().join(""))
@@ -407,11 +407,11 @@ class ReadableExpression {
   /**
    * @description Match any of the given characters
    * @param {(string|number|string[]|number[])} value characters to match
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
   anyOf(value) {
-    return ReadableExpression.from(
+    return RegExpstructor.from(
       setNode(
         this.#rootNode,
         anyOf(getNode(this.#rootNode), [value].flat().join(""))
@@ -421,11 +421,11 @@ class ReadableExpression {
   /**
    * @description Match some of the given characters
    * @param {(string|number|string[]|number[])} value characters to match
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
   someOf(value) {
-    return ReadableExpression.from(
+    return RegExpstructor.from(
       setNode(
         this.#rootNode,
         someOf(getNode(this.#rootNode), [value].flat().join(""))
@@ -436,11 +436,11 @@ class ReadableExpression {
   /**
    * @description Match one chartacter of the given characters
    * @param {(string|number|string[]|number[])} value characters to match
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
   oneOf(value) {
-    return ReadableExpression.from(
+    return RegExpstructor.from(
       setNode(
         this.#rootNode,
         oneOf(getNode(this.#rootNode), [value].flat().join(""))
@@ -451,8 +451,8 @@ class ReadableExpression {
   /**
    * @description Shorthand for anyOf(value)
    * @param {string|number} value value to find
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
   any(value) {
     return this.anyOf(value);
@@ -460,34 +460,34 @@ class ReadableExpression {
 
   /**
    * @description Ensure that the parameter does not follow (negative lookahead)
-   * @param {string|number|RegExp|ReadableExpression} value
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @param {string|number|RegExp|RegExpstructor} value
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
   assertNotFollowedBy(value) {
-    return ReadableExpression.from(
+    return RegExpstructor.from(
       setNode(
         this.#rootNode,
         notFollowedBy(
           getNode(this.#rootNode),
-          ReadableExpression.of(value).#rootNode.node
+          RegExpstructor.of(value).#rootNode.node
         )
       )
     );
   }
   /**
    * @description Ensure that the parameter does follow (positive lookahead)
-   * @param {string|number|RegExp|ReadableExpression} value
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @param {string|number|RegExp|RegExpstructor} value
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
   assertFollowedBy(value) {
-    return ReadableExpression.from(
+    return RegExpstructor.from(
       setNode(
         this.#rootNode,
         followedBy(
           getNode(this.#rootNode),
-          ReadableExpression.of(value).#rootNode.node
+          RegExpstructor.of(value).#rootNode.node
         )
       )
     );
@@ -495,13 +495,13 @@ class ReadableExpression {
 
   /**
    * @description Match any character in these ranges
-   * @example ReadableExpression.empty.charOfRanges(["a","z"], ["0", "9"]) // [a-z0-9]
+   * @example RegExpstructor.empty.charOfRanges(["a","z"], ["0", "9"]) // [a-z0-9]
    * @param {...([string, string])} characterRanges total number of elements must be event
-   * @returns {ReadableExpression}
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor}
+   * @memberOf RegExpstructor#
    */
   charOfRanges(...characterRanges) {
-    return ReadableExpression.from(
+    return RegExpstructor.from(
       setNode(
         this.#rootNode,
         ranges(getNode(this.#rootNode), makeRanges(characterRanges), false)
@@ -510,13 +510,13 @@ class ReadableExpression {
   }
   /**
    * @description Match any character that is not in these ranges
-   * @example ReadableExpression.empty.charNotOfRanges(["a","z"], ["0", "9"]) // [^a-z0-9]
+   * @example RegExpstructor.empty.charNotOfRanges(["a","z"], ["0", "9"]) // [^a-z0-9]
    * @param {...([string, string])} characterRanges total number of elements must be event
-   * @returns {ReadableExpression}
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor}
+   * @memberOf RegExpstructor#
    */
   charNotOfRanges(...characterRanges) {
-    return ReadableExpression.from(
+    return RegExpstructor.from(
       setNode(
         this.#rootNode,
         ranges(getNode(this.#rootNode), makeRanges(characterRanges), true)
@@ -528,17 +528,17 @@ class ReadableExpression {
 
   /**
    * @description Match a Line break
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
   lineBreak() {
-    return this.then(ReadableExpression.linebreak);
+    return this.then(RegExpstructor.linebreak);
   }
 
   /**
    * @description A shorthand for lineBreak() for html-minded users
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
   br() {
     return this.lineBreak();
@@ -546,58 +546,58 @@ class ReadableExpression {
 
   /**
    * @description Match a tab character
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
   tab() {
-    return this.then(ReadableExpression.tab);
+    return this.then(RegExpstructor.tab);
   }
 
   /**
    * @description Match any alphanumeric sequence
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
   word() {
-    return this.then(ReadableExpression.word);
+    return this.then(RegExpstructor.word);
   }
 
   /**
    * @description Match a single digit
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
   digit() {
-    return this.then(ReadableExpression.digit);
+    return this.then(RegExpstructor.digit);
   }
 
   /**
    * @description Match a single whitespace
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
   whitespace() {
-    return this.then(ReadableExpression.whitespace);
+    return this.then(RegExpstructor.whitespace);
   }
 
   // Modifiers //
   /**
    * @description Add a regex flag - default flags are: "gi"
    * @param {string} flag
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
   addFlag(flag = "") {
-    return ReadableExpression.from(addFlags(this.#rootNode, flag));
+    return RegExpstructor.from(addFlags(this.#rootNode, flag));
   }
   /**
    * @description Remove a regex flag - default flags are: "gi"
    * @param {string} flag
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
   removeFlag(flag) {
-    return ReadableExpression.from(removeFlags(this.#rootNode, flag));
+    return RegExpstructor.from(removeFlags(this.#rootNode, flag));
   }
 
   /**
@@ -612,8 +612,8 @@ class ReadableExpression {
   /**
    * @description Adds an "i" regex flag - default flags are: "gm"
    * @param {boolean=true} enable
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
   withAnyCase(enable = true) {
     return enable ? this.addFlag("i") : this.removeFlag("i");
@@ -621,8 +621,8 @@ class ReadableExpression {
   /**
    * @description Removes a "g" regex flag - default flags are: "gm"
    * @param {boolean=true} enable `true` means no "g" flag
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
   stopAtFirst(enable = true) {
     return !enable ? this.addFlag("g") : this.removeFlag("g");
@@ -630,7 +630,7 @@ class ReadableExpression {
   /**
    *
    * @param {boolean=true} enable
-   * @returns {ReadableExpression}
+   * @returns {RegExpstructor}
    */
   global(enable = true) {
     return enable ? this.addFlag("g") : this.removeFlag("g");
@@ -638,7 +638,7 @@ class ReadableExpression {
   /**
    *
    * @param {string} flag
-   * @returns {ReadableExpression}
+   * @returns {RegExpstructor}
    */
   toggleFlag(flag) {
     return !this.hasFlag(flag) ? this.addFlag(flag) : this.removeFlag(flag);
@@ -647,8 +647,8 @@ class ReadableExpression {
   /**
    * @description Removes any set "m" regex flag - default flags are: "gm"
    * @param {boolean=true} enable `true` means "m" flag will be removed
-   * @returns {ReadableExpression} new ReadableExpression
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor} new RegExpstructor
+   * @memberOf RegExpstructor#
    */
   searchOneLine(enable = true) {
     return enable ? this.removeFlag("m") : this.addFlag("m");
@@ -662,11 +662,11 @@ class ReadableExpression {
    * ```
    * @param {number} min
    * @param {number} max
-   * @returns {ReadableExpression}
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor}
+   * @memberOf RegExpstructor#
    */
   repeat(min, max) {
-    return ReadableExpression.from(
+    return RegExpstructor.from(
       setNode(
         this.#rootNode,
         repeat(
@@ -683,11 +683,11 @@ class ReadableExpression {
    * Sx("abc").whitespace().repeatExactly(5).compile().toString() === /(?:abc\w){5}/gm.toString()
    * ```
    * @param {number} n must be > 0
-   * @returns {ReadableExpression}
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor}
+   * @memberOf RegExpstructor#
    */
   repeatExactly(n) {
-    return ReadableExpression.from(
+    return RegExpstructor.from(
       setNode(
         this.#rootNode,
         repeatExact(getNode(this.#rootNode), n != null ? n | 0 : void 0)
@@ -697,11 +697,11 @@ class ReadableExpression {
 
   /**
    * @description the expression should match at least once
-   * @returns {ReadableExpression}
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor}
+   * @memberOf RegExpstructor#
    */
   oneOrMore() {
-    return ReadableExpression.from(
+    return RegExpstructor.from(
       setNode(this.#rootNode, oneOrMore(getNode(this.#rootNode)))
     );
   }
@@ -709,11 +709,11 @@ class ReadableExpression {
   /**
    * @description the expression should match zero or more times
    * @param {boolean} [lazy] enable lazy (non greedy) matching
-   * @returns {ReadableExpression}
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor}
+   * @memberOf RegExpstructor#
    */
   zeroOrMore(lazy) {
-    return ReadableExpression.from(
+    return RegExpstructor.from(
       setNode(this.#rootNode, zeroOrMore(getNode(this.#rootNode)), lazy)
     );
   }
@@ -722,11 +722,11 @@ class ReadableExpression {
   /**
    *
    * @param {string} [name] optionally name your capturing group
-   * @returns {ReadableExpression}
-   * @memberOf ReadableExpression#
+   * @returns {RegExpstructor}
+   * @memberOf RegExpstructor#
    */
   capture(name) {
-    return ReadableExpression.from(
+    return RegExpstructor.from(
       setNode(
         this.#rootNode,
         group(getNode(this.#rootNode), name?.toString?.() ?? void 0)
@@ -736,9 +736,9 @@ class ReadableExpression {
 
   // Miscellaneous //
   /**
-   * @description compile the ReadExp to a RegExp
+   * @description compile the ReStructor to a RegExp
    * @returns {RegExp}
-   * @memberOf ReadableExpression#
+   * @memberOf RegExpstructor#
    */
   compile() {
     const { source, flags } = stringify(this.#rootNode);
@@ -746,13 +746,13 @@ class ReadableExpression {
   }
 }
 
-existingClasses.push(ReadableExpression);
+existingClasses.push(RegExpstructor);
 
-ReadableExpression.prototype.group = ReadableExpression.prototype.capture;
-ReadableExpression.prototype.followedBy =
-  ReadableExpression.prototype.assertFollowedBy;
-ReadableExpression.prototype.notFollowedBy =
-  ReadableExpression.prototype.assertNotFollowedBy;
+RegExpstructor.prototype.group = RegExpstructor.prototype.capture;
+RegExpstructor.prototype.followedBy =
+  RegExpstructor.prototype.assertFollowedBy;
+RegExpstructor.prototype.notFollowedBy =
+  RegExpstructor.prototype.assertNotFollowedBy;
 
 const makeValueDescriptor = (value) => ({
   value,
@@ -780,14 +780,14 @@ const writeWarning = (text, logType = "error") => {
 };
 
 const warnArgType = writeWarning(
-  "Argument type is not supported. Returning empty ReadExp."
+  "Argument type is not supported. Returning empty ReStructor."
 );
 /**
  *
- * @param {string|number|RegExp|ReadableExpression} [value]
- * @returns {ReadableExpression}
+ * @param {string|number|RegExp|RegExpstructor} [value]
+ * @returns {RegExpstructor}
  */
-export default function ReadExp(value) {
+export default function ReStructor(value) {
   const valueType = typeof value;
   if (
     value != null &&
@@ -796,21 +796,21 @@ export default function ReadExp(value) {
       value instanceof RegExp ||
       isInstance(value))
   ) {
-    return ReadableExpression.of(value);
+    return RegExpstructor.of(value);
   }
   if (value != null && process.env.NODE_ENV !== "production") {
     warnArgType();
   }
-  return ReadableExpression.empty;
+  return RegExpstructor.empty;
 }
 
-ReadExp.or = ReadableExpression.or.bind(ReadableExpression);
-ReadExp.seq = ReadableExpression.seq.bind(ReadableExpression);
-ReadExp.of = ReadableExpression.of.bind(ReadableExpression);
-ReadExp.digit = ReadableExpression.digit;
-ReadExp.word = ReadableExpression.word;
-ReadExp.empty = ReadableExpression.empty;
-ReadExp.linebreak = ReadableExpression.linebreak;
-ReadExp.tab = ReadableExpression.tab;
-ReadExp.whitespace = ReadableExpression.whitespace;
-ReadExp.any = ReadableExpression.any;
+ReStructor.or = RegExpstructor.or.bind(RegExpstructor);
+ReStructor.seq = RegExpstructor.seq.bind(RegExpstructor);
+ReStructor.of = RegExpstructor.of.bind(RegExpstructor);
+ReStructor.digit = RegExpstructor.digit;
+ReStructor.word = RegExpstructor.word;
+ReStructor.empty = RegExpstructor.empty;
+ReStructor.linebreak = RegExpstructor.linebreak;
+ReStructor.tab = RegExpstructor.tab;
+ReStructor.whitespace = RegExpstructor.whitespace;
+ReStructor.any = RegExpstructor.any;

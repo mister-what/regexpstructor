@@ -17,13 +17,5 @@
   "warnings": {
     "error": "+101"
   },
-  "external-stdlib" : "@rescript/std",
-  "gentypeconfig": {
-    "language": "untyped",
-    "shims": {},
-    "debug": {
-      "all": false,
-      "basic": false
-    }
-  }
+  "external-stdlib" : "@rescript/std"
 }
