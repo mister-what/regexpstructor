@@ -11,7 +11,7 @@
     "fluid"
   ],
   "author": "Jonas Winzen <2ndjpeg+npmjs@gmail.com>",
-  "homepage": "https://github.com/mister-what/parsinatix#readme",
+  "homepage": "https://github.com/mister-what/regexpstructor#readme",
   "license": "MIT",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
