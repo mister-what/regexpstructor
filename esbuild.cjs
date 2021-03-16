@@ -3,13 +3,15 @@ const babel = import("esbuild-plugin-babel").then(
   ({ default: babel }) => babel
 );
 
-const build = ({ format, env = { NODE_ENV: "development" } }) =>
+const build = ({ format, extension, env = { NODE_ENV: "development" } }) =>
   babel.then((babel) =>
     esbuild.build({
       format,
       bundle: true,
       entryPoints: ["src/index.js"],
-      outdir: `dist/${format}`,
+      outExtension: { ".js": `.${extension}` },
+      outdir: "dist",
+      target: ["node6"],
       plugins: [
         babel({
           config: {
@@ -30,7 +32,7 @@ const build = ({ format, env = { NODE_ENV: "development" } }) =>
           JSON.stringify(value),
         ])
       ),
-     // minify: true,
+      // minify: true,
     })
   );
 Promise.resolve()
@@ -39,8 +41,16 @@ Promise.resolve()
   })
   .then(() =>
     Promise.all([
-      build({ format: "esm", env: { NODE_ENV: "production" } }),
-      build({ format: "cjs", env: { NODE_ENV: "production" } }),
+      build({
+        format: "esm",
+        extension: "mjs",
+        env: { NODE_ENV: "production" },
+      }),
+      build({
+        format: "cjs",
+        extension: "cjs",
+        env: { NODE_ENV: "production" },
+      }),
     ])
   )
   .then(() => {

@@ -6,11 +6,13 @@ module.exports = (api) => {
           [
             "@babel/preset-env",
             {
-              targets: {
-                node: "current",
-              },
+              targets: api.env("test")
+                ? {
+                    node: "current",
+                  }
+                : { browsers: ">1%, not IE < 11" },
               useBuiltIns: "usage",
-              corejs: 3,
+              corejs: "3.9",
               shippedProposals: true,
             },
           ],

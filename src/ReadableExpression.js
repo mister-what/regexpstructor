@@ -1,5 +1,6 @@
 import {
   createRoot,
+  flags_to_opt_string,
   then_,
   or_,
   maybe,
@@ -32,12 +33,13 @@ import {
   oneOrMore,
   oneOf,
   group,
+  hasFlag,
 } from "./RegexAst.bs";
 import { stringify } from "./StringifyAst.bs";
 import ow from "ow";
 import { pipe } from "fast-fp.macro";
 
-const flatten = (...args) => args.flatten(Infinity);
+const flatten = (...args) => args.flat(Infinity);
 
 const validate = (validator) => (arg) => (validator(arg), arg);
 
@@ -63,6 +65,26 @@ const _makeRanges = (flatRanges) => {
   return rangePairs;
 };
 const makeRanges = pipe(flatten, validateRanges, _makeRanges);
+
+const EXISTING_INSTANCES_KEY = "$7a3afcebc18ce55fe6f8445324d27b6e$";
+
+const existingClasses =
+  RegExp.prototype[Symbol.for(EXISTING_INSTANCES_KEY)] || [];
+
+Object.defineProperty(RegExp.prototype, Symbol.for(EXISTING_INSTANCES_KEY), {
+  enumerable: false,
+  configurable: true,
+  writable: false,
+  value: existingClasses,
+});
+
+const isInstanceOfExisting = (obj) =>
+  existingClasses.find((Class) => obj instanceof Class);
+
+const isInstance = (obj) => {
+  if (obj == null) return false;
+  return obj instanceof ReadableExpression || isInstanceOfExisting(obj);
+};
 
 /**
  * @template T
@@ -96,7 +118,7 @@ class ReadableExpression {
       this.#rootNode = createRoot({
         prefix,
         suffix,
-        flags,
+        flags: flags_to_opt_string(flags),
         source,
         node,
         sanitize,
@@ -105,7 +127,7 @@ class ReadableExpression {
   }
 
   static #getRootNode = (x) => {
-    if (!(x instanceof this))
+    if (!isInstance(x))
       throw new Error(`${x} is not an instance of ReadableExpression`);
     function _getNode() {
       // noinspection JSPotentiallyInvalidUsageOfClassThis
@@ -131,7 +153,12 @@ class ReadableExpression {
    * @memberOf ReadableExpression
    */
   static of(x) {
-    if (x instanceof ReadableExpression) return x;
+    if (x instanceof this) {
+      return x;
+    }
+    if (isInstance(x)) {
+      return new this(this.#preSanitize(x.compile()));
+    }
     const params = this.#preSanitize(x);
     return new this(params);
   }
@@ -144,7 +171,7 @@ class ReadableExpression {
    */
   static or(...xs) {
     const verbals = xs.map((x) => {
-      if (x instanceof ReadableExpression) return x;
+      if (isInstance(x)) return x;
       return ReadableExpression.of(x);
     });
 
@@ -574,6 +601,15 @@ class ReadableExpression {
   }
 
   /**
+   *
+   * @param {string} flag
+   * @returns {boolean}
+   */
+  hasFlag(flag) {
+    return hasFlag(this.#rootNode, flag);
+  }
+
+  /**
    * @description Adds an "i" regex flag - default flags are: "gm"
    * @param {boolean=true} enable
    * @returns {ReadableExpression} new ReadableExpression
@@ -589,8 +625,25 @@ class ReadableExpression {
    * @memberOf ReadableExpression#
    */
   stopAtFirst(enable = true) {
+    return !enable ? this.addFlag("g") : this.removeFlag("g");
+  }
+  /**
+   *
+   * @param {boolean=true} enable
+   * @returns {ReadableExpression}
+   */
+  global(enable = true) {
     return enable ? this.addFlag("g") : this.removeFlag("g");
   }
+  /**
+   *
+   * @param {string} flag
+   * @returns {ReadableExpression}
+   */
+  toggleFlag(flag) {
+    return !this.hasFlag(flag) ? this.addFlag(flag) : this.removeFlag(flag);
+  }
+
   /**
    * @description Removes any set "m" regex flag - default flags are: "gm"
    * @param {boolean=true} enable `true` means "m" flag will be removed
@@ -693,6 +746,8 @@ class ReadableExpression {
   }
 }
 
+existingClasses.push(ReadableExpression);
+
 ReadableExpression.prototype.group = ReadableExpression.prototype.capture;
 ReadableExpression.prototype.followedBy =
   ReadableExpression.prototype.assertFollowedBy;
@@ -739,7 +794,7 @@ export default function ReadExp(value) {
     (valueType === "string" ||
       valueType === "number" ||
       value instanceof RegExp ||
-      value instanceof ReadableExpression)
+      isInstance(value))
   ) {
     return ReadableExpression.of(value);
   }

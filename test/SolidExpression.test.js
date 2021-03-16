@@ -1,21 +1,21 @@
 import ReadExp from "../src";
 
-test("should build a uuid regexp via SolidExpressions", () => {
+test("should build a uuid regexp via ReadableExpressions", () => {
   const hexBlock = ReadExp().charOfRanges(["0", "9"], ["a", "f"]);
-  const sx = hexBlock
+  const readExp = hexBlock
     .repeatExactly(8)
     .then("-")
     .then(hexBlock.repeatExactly(4).then("-").repeatExactly(3))
     .then(hexBlock.repeatExactly(12))
     .withAnyCase()
     .searchOneLine();
-  const regex = sx.compile();
+  const regex = readExp.compile();
   expect(`/${regex.source}/${regex.flags}`).toMatchInlineSnapshot(
     `"/[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}/gi"`
   );
 });
-test("should build regexp via SolidExpressions", () => {
-  const sx = ReadExp(/^test_expr$/)
+test("should build regexp via ReadableExpressions", () => {
+  const readExp = ReadExp(/^test_expr$/)
     .maybe(ReadExp.whitespace)
     .then(ReadExp("hello").repeat(1, 3).capture("hellos"))
     .repeat(1, 4)
@@ -24,7 +24,7 @@ test("should build regexp via SolidExpressions", () => {
     .followedBy("!")
     .then(/./);
 
-  const regex = sx.compile();
+  const regex = readExp.compile();
   expect(regex.source).toMatchInlineSnapshot(
     `"^(?:test_expr(?:\\\\s)?(?<hellos>(?:hello){1,3})){1,4}(?:\\\\s)+(?<worldGroup>world|World)?(?=!)."`
   );

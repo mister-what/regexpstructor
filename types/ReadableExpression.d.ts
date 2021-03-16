@@ -38,14 +38,18 @@ interface ReadableExpression {
    * @returns {ReadableExpression} new ReadableExpression
    * @memberOf ReadableExpression#
    */
-  then(value: string | RegExp | number | ReadableExpression): ReadableExpression;
+  then(
+    value: string | RegExp | number | ReadableExpression
+  ): ReadableExpression;
   /**
    * @description Add an optional branch for matching
    * @param {(string|RegExp|number|ReadableExpression)} value value to find
    * @returns {ReadableExpression} new ReadableExpression
    * @memberOf ReadableExpression#
    */
-  maybe(value: string | RegExp | number | ReadableExpression): ReadableExpression;
+  maybe(
+    value: string | RegExp | number | ReadableExpression
+  ): ReadableExpression;
   /**
    * @description Add alternative expressions
    * @param {(string|RegExp|number|ReadableExpression)} value value to find
@@ -83,7 +87,9 @@ interface ReadableExpression {
    * @returns {ReadableExpression} new ReadableExpression
    * @memberOf ReadableExpression#
    */
-  somethingBut(value: string | number | string[] | number[]): ReadableExpression;
+  somethingBut(
+    value: string | number | string[] | number[]
+  ): ReadableExpression;
   /**
    * @description Match any of the given characters
    * @param {(string|number|string[]|number[])} value characters to match
@@ -216,6 +222,8 @@ interface ReadableExpression {
    * @memberOf ReadableExpression#
    */
   stopAtFirst(enable?: boolean): ReadableExpression;
+  global(enable?: boolean): ReadableExpression;
+  toggleFlag(flag: string): ReadableExpression;
   /**
    * @description Removes any set "m" regex flag - default flags are: "gi"
    * @param {boolean=true} enable `true` means "m" flag will be removed
@@ -275,7 +283,9 @@ interface ReadableExpression {
 type ReadablePrimitive = ReadableExpression;
 
 interface ReadableExpressionConstructor {
-  new (value: string | number | RegExp | ReadableExpression): ReadableExpression;
+  new (
+    value: string | number | RegExp | ReadableExpression
+  ): ReadableExpression;
   /**
    *
    * @param {string|number|RegExp|ReadableExpression} [value]
@@ -297,14 +307,18 @@ interface ReadableExpressionConstructor {
    * @returns {ReadableExpression}
    * @memberOf ReadableExpression
    */
-  or(...xs: (string | number | RegExp | ReadableExpression)[]): ReadableExpression;
+  or(
+    ...xs: (string | number | RegExp | ReadableExpression)[]
+  ): ReadableExpression;
   /**
    * @description conjunction (all must match) of the argument expressions
    * @param {...(String|Number|RegExp|ReadableExpression)} xs
    * @returns {ReadableExpression}
    * @memberOf ReadableExpression
    */
-  seq(...xs: (string | number | RegExp | ReadableExpression)[]): ReadableExpression;
+  seq(
+    ...xs: (string | number | RegExp | ReadableExpression)[]
+  ): ReadableExpression;
   /**
    * @description a ReadExp that matches a whitespace
    * @type {ReadablePrimitive}

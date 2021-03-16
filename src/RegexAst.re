@@ -68,7 +68,7 @@ type rootNode('a) =
       prefix: string,
       node: astNode,
       suffix: string,
-      flags: string,
+      flags: Belt.Set.String.t,
     });
 let getNode = (RootNode(root)) => root.node;
 let setNode = (RootNode(root), node) => RootNode({...root, node});
@@ -76,46 +76,24 @@ let setPrefix = (RootNode(root), prefix) => RootNode({...root, prefix});
 let setSuffix = (RootNode(root), suffix) => RootNode({...root, suffix});
 
 let addFlags = (RootNode(root), flags) => {
-  let rec addToFlags = (existingFlags, newFlags) =>
-    switch (newFlags) {
-    | [] => existingFlags
-    | [flag, ...rest] =>
-      addToFlags(
-        existingFlags->Js.String2.includes(flag)
-          ? existingFlags : existingFlags->Js.String2.concat(flag),
-        rest,
-      )
-    };
-  RootNode({
-    ...root,
-    flags:
-      addToFlags(
-        root.flags,
-        Belt.List.fromArray(Js.String.split("", flags)),
-      ),
-  });
+  Belt.Set.String.(
+    RootNode({
+      ...root,
+      flags: root.flags->union(flags->Js.String2.split("")->fromArray),
+    })
+  );
 };
 let removeFlags = (RootNode(root), flags) => {
-  let rec removeFromFlags = (existingFlags, flagsToRemove) =>
-    switch (flagsToRemove) {
-    | [] => existingFlags
-    | [flag, ...rest] =>
-      removeFromFlags(
-        existingFlags->Js.String2.includes(flag)
-          ? Js.Array.joinWith("", existingFlags->Js.String2.split(flag))
-          : existingFlags,
-        rest,
-      )
-    };
-  RootNode({
-    ...root,
-    flags:
-      removeFromFlags(
-        root.flags,
-        Belt.List.fromArray(Js.String.split("", flags)),
-      ),
-  });
+  Belt.Set.String.(
+    RootNode({
+      ...root,
+      flags: root.flags->diff(Js.String.split("", flags)->fromArray),
+    })
+  );
 };
+let hasFlag = (RootNode(root), flag) =>
+  Belt.Set.String.(root.flags->has(flag));
+
 let exact = string => string->sanitize->Exact->Match;
 let exact_ = string => string->Exact->Match;
 let makeNode = (source, node, sanitize) =>
@@ -148,12 +126,25 @@ let createRoot = ({prefix, suffix, flags, source, node, sanitize}) =>
     ~prefix=prefix |> defaultToEmptyString,
     ~suffix=suffix |> defaultToEmptyString,
     ~source,
-    ~flags=flags |> defaultFlags,
+    ~flags=
+      defaultFlags(flags)
+      ->Js.String2.split(_, "")
+      ->Belt.Set.String.fromArray,
     ~sanitize=sanitize |> defaultSanitize,
     ~node,
     (),
   );
 
+let flagsToString = flags =>
+  flags->Belt.Set.String.toArray->Js.Array2.joinWith("");
+let flags_to_opt_string = flags => {
+  let str = flagsToString(flags);
+  if (Js.String.length(str) == 0) {
+    None;
+  } else {
+    Some(str);
+  };
+};
 let empty = Empty;
 
 let and_ = (a, b) =>

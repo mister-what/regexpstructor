@@ -1,5 +1,7 @@
 open RegexAst;
 
+let stringifyFlags = flagsToString;
+
 let rec stringifyQuanifier = kind => {
   switch (kind) {
   | `ZeroOrOne => "?"
@@ -13,84 +15,113 @@ let rec stringifyQuanifier = kind => {
   | `MinMax(None, None) => "{" ++ "," ++ "}"
   };
 }
-and stringifyNode = (node, parents) =>
-  switch (node, parents) {
-  | (Empty, _) => ""
-  | (Match(Exact(str)), _) => str
-  | (Match(Chars({chars, negative})), _) =>
-    "["
-    ++ (negative ? "^" : "")
-    ++ chars
-       ->Js.Array2.map(kind =>
-           switch (kind) {
-           | `Chars(value) => value
-           | `Range(from, to_) => from ++ "-" ++ to_
-           }
-         )
-       ->Js.Array2.joinWith("")
-    ++ "]"
-  | (ConcatExpr({left, right, kind: `Conjunction}) as parent, grandParents) =>
-    stringifyNode(left, [parent, ...grandParents])
-    ++ stringifyNode(right, [parent, ...grandParents])
-  | (
-      ConcatExpr({left, right, kind: `Disjunction}) as parent,
-      [
-        ConcatExpr({kind: `Disjunction}) | NonCaptureGroup(_) | CaptureGroup(_),
-        ..._rest,
-      ] as grandParents,
-    ) =>
-    stringifyNode(left, [parent, ...grandParents])
-    ++ "|"
-    ++ stringifyNode(right, [parent, ...grandParents])
-  | (ConcatExpr({left, right, kind: `Disjunction}) as parent, grandParents) =>
-    "(?:"
-    ++ stringifyNode(left, [parent, ...grandParents])
-    ++ "|"
-    ++ stringifyNode(right, [parent, ...grandParents])
-    ++ ")"
-  | (QuantifierExpr({node: Empty as node}) as parent, grandParents) =>
-    stringifyNode(node, [parent, ...grandParents])
-  | (
-      QuantifierExpr({
-        node:
-          (NonCaptureGroup(_) | CaptureGroup(_) | Match(Chars(_))) as node,
-        kind,
-      }),
-      grandParents,
-    ) =>
-    stringifyNode(node, grandParents) ++ stringifyQuanifier(kind)
-  | (QuantifierExpr({node, kind}) as parent, grandParents) =>
-    stringifyNode(NonCaptureGroup({node: node}), [parent, ...grandParents])
-    ++ stringifyQuanifier(kind)
-  | (
-      NonCaptureGroup({node}),
-      [NonCaptureGroup(_) | CaptureGroup(_), ..._rest] as grandParents,
-    ) =>
-    stringifyNode(node, grandParents)
-  | (NonCaptureGroup({node}) as parent, grandParents) =>
-    "(?:" ++ stringifyNode(node, [parent, ...grandParents]) ++ ")"
-  | (CaptureGroup({node, name: Some(name)}) as parent, grandParents) =>
-    "(?<"
-    ++ name
-    ++ ">"
-    ++ stringifyNode(node, [parent, ...grandParents])
-    ++ ")"
-  | (CaptureGroup({node, name: None}) as parent, grandParents) =>
-    "(" ++ stringifyNode(node, [parent, ...grandParents]) ++ ")"
-  | (LookaheadExpr({node, lookahead, kind}) as realParent, grandParents) =>
-    stringifyNode(node, [realParent, ...grandParents])
-    ++ "(?"
-    ++ (kind == `Negative && kind != `Positive ? "!" : "=")
-    ++ stringifyNode(
-         lookahead,
-         [NonCaptureGroup({node: lookahead}), ...grandParents],
-       )
-    ++ ")"
+and stringifyNode = (node, parents) => {
+  let id = (. x) => x;
+  let rec stringify = (node, parents, k) => {
+    switch (node, parents) {
+    | (Empty, _) => k(. "")
+    | (Match(Exact(str)), _) => k(. str)
+    | (Match(Chars({chars, negative})), _) =>
+      k(.
+        "["
+        ++ (negative ? "^" : "")
+        ++ chars
+           ->Js.Array2.map(kind =>
+               switch (kind) {
+               | `Chars(value) => value
+               | `Range(from, to_) => from ++ "-" ++ to_
+               }
+             )
+           ->Js.Array2.joinWith("")
+        ++ "]",
+      )
+    | (ConcatExpr({left, right, kind: `Conjunction}) as parent, grandParents) =>
+      stringify(left, [parent, ...grandParents], (. leftStr) =>
+        stringify(right, [parent, ...grandParents], (. rightStr) =>
+          k(. leftStr ++ rightStr)
+        )
+      )
+    | (
+        ConcatExpr({left, right, kind: `Disjunction}) as parent,
+        [
+          ConcatExpr({kind: `Disjunction}) | NonCaptureGroup(_) |
+          CaptureGroup(_),
+          ..._rest,
+        ] as grandParents,
+      ) =>
+      stringify(left, [parent, ...grandParents], (. leftStr) =>
+        stringify(right, [parent, ...grandParents], (. rightStr) =>
+          k(. leftStr ++ "|" ++ rightStr)
+        )
+      )
+    | (ConcatExpr({left, right, kind: `Disjunction}) as parent, grandParents) =>
+      stringify(left, [parent, ...grandParents], (. leftStr) =>
+        stringify(right, [parent, ...grandParents], (. rightStr) =>
+          k(. "(?:" ++ leftStr ++ "|" ++ rightStr ++ ")")
+        )
+      )
+
+    | (QuantifierExpr({node: Empty as node}) as parent, grandParents) =>
+      stringify(node, [parent, ...grandParents], k)
+    | (
+        QuantifierExpr({
+          node:
+            (NonCaptureGroup(_) | CaptureGroup(_) | Match(Chars(_))) as node,
+          kind,
+        }),
+        grandParents,
+      ) =>
+      stringify(node, grandParents, (. nodeStr) =>
+        k(. nodeStr ++ stringifyQuanifier(kind))
+      )
+    | (QuantifierExpr({node, kind}) as parent, grandParents) =>
+      stringify(
+        NonCaptureGroup({node: node}),
+        [parent, ...grandParents],
+        (. nodeStr) =>
+        k(. nodeStr ++ stringifyQuanifier(kind))
+      )
+
+    | (
+        NonCaptureGroup({node}),
+        [NonCaptureGroup(_) | CaptureGroup(_), ..._rest] as grandParents,
+      ) =>
+      stringify(node, grandParents, k)
+    | (NonCaptureGroup({node}) as parent, grandParents) =>
+      stringify(node, [parent, ...grandParents], (. nodeStr) =>
+        k(. "(?:" ++ nodeStr ++ ")")
+      )
+    | (CaptureGroup({node, name: Some(name)}) as parent, grandParents) =>
+      stringify(node, [parent, ...grandParents], (. nodeStr) =>
+        k(. "(?<" ++ name ++ ">" ++ nodeStr ++ ")")
+      )
+    | (CaptureGroup({node, name: None}) as parent, grandParents) =>
+      stringify(node, [parent, ...grandParents], (. nodeStr) =>
+        k(. "(" ++ nodeStr ++ ")")
+      )
+    | (LookaheadExpr({node, lookahead, kind}) as realParent, grandParents) =>
+      stringify(node, [realParent, ...grandParents], (. nodeStr_a) =>
+        stringify(
+          lookahead,
+          [NonCaptureGroup({node: lookahead}), ...grandParents],
+          (. lookaheadStr) =>
+          k(.
+            nodeStr_a
+            ++ "(?"
+            ++ (kind == `Negative && kind != `Positive ? "!" : "=")
+            ++ lookaheadStr
+            ++ ")",
+          )
+        )
+      )
+    };
   };
+  stringify(node, parents, id);
+};
 
 let stringify = (RootNode({node, prefix, suffix, flags})) => {
   "source": prefix ++ stringifyNode(node, []) ++ suffix,
-  "flags": flags,
+  "flags": stringifyFlags(flags),
 };
 /*
  let myNode =

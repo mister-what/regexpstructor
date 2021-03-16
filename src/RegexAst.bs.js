@@ -2,6 +2,7 @@
 
 import * as Belt_List from "@rescript/std/lib/es6/belt_List.js";
 import * as Caml_option from "@rescript/std/lib/es6/caml_option.js";
+import * as Belt_SetString from "@rescript/std/lib/es6/belt_SetString.js";
 
 var toEscape = /([.\][|*?+(){}^$\\:=])/g;
 
@@ -59,47 +60,25 @@ function setSuffix(root, suffix) {
 }
 
 function addFlags(root, flags) {
-  var addToFlags = function (_existingFlags, _newFlags) {
-    while(true) {
-      var newFlags = _newFlags;
-      var existingFlags = _existingFlags;
-      if (!newFlags) {
-        return existingFlags;
-      }
-      var flag = newFlags.hd;
-      _newFlags = newFlags.tl;
-      _existingFlags = existingFlags.includes(flag) ? existingFlags : existingFlags.concat(flag);
-      continue ;
-    };
-  };
   return /* RootNode */{
           prefix: root.prefix,
           node: root.node,
           suffix: root.suffix,
-          flags: addToFlags(root.flags, Belt_List.fromArray(flags.split("")))
+          flags: Belt_SetString.union(root.flags, Belt_SetString.fromArray(flags.split("")))
         };
 }
 
 function removeFlags(root, flags) {
-  var removeFromFlags = function (_existingFlags, _flagsToRemove) {
-    while(true) {
-      var flagsToRemove = _flagsToRemove;
-      var existingFlags = _existingFlags;
-      if (!flagsToRemove) {
-        return existingFlags;
-      }
-      var flag = flagsToRemove.hd;
-      _flagsToRemove = flagsToRemove.tl;
-      _existingFlags = existingFlags.includes(flag) ? existingFlags.split(flag).join("") : existingFlags;
-      continue ;
-    };
-  };
   return /* RootNode */{
           prefix: root.prefix,
           node: root.node,
           suffix: root.suffix,
-          flags: removeFromFlags(root.flags, Belt_List.fromArray(flags.split("")))
+          flags: Belt_SetString.diff(root.flags, Belt_SetString.fromArray(flags.split("")))
         };
+}
+
+function hasFlag(root, flag) {
+  return Belt_SetString.has(root.flags, flag);
 }
 
 function exact(string) {
@@ -180,7 +159,20 @@ function defaultSanitize(param) {
 }
 
 function createRoot(param) {
-  return createRoot_(defaultTo("", param.prefix), defaultTo("", param.suffix), defaultTo("gm", param.flags), param.source, param.node, defaultTo(true, param.sanitize), undefined);
+  return createRoot_(defaultTo("", param.prefix), defaultTo("", param.suffix), Belt_SetString.fromArray(defaultTo("gm", param.flags).split("")), param.source, param.node, defaultTo(true, param.sanitize), undefined);
+}
+
+function flagsToString(flags) {
+  return Belt_SetString.toArray(flags).join("");
+}
+
+function flags_to_opt_string(flags) {
+  var str = Belt_SetString.toArray(flags).join("");
+  if (str.length === 0) {
+    return ;
+  } else {
+    return str;
+  }
 }
 
 function and_(a, b) {
@@ -637,6 +629,7 @@ export {
   setSuffix ,
   addFlags ,
   removeFlags ,
+  hasFlag ,
   exact ,
   exact_ ,
   makeNode ,
@@ -646,6 +639,8 @@ export {
   defaultFlags ,
   defaultSanitize ,
   createRoot ,
+  flagsToString ,
+  flags_to_opt_string ,
   empty ,
   and_ ,
   range_ ,
