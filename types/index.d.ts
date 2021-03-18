@@ -1,2 +1,2 @@
-import ReStructor from "./RegExpstructor";
+import ReStructor from "./ReadableExpression";
 export = ReStructor;
