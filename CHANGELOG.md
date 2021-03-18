@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/mister-what/regexpstructor/compare/v1.1.1...v1.1.2) (2021-03-18)
+
+
+### Bug Fixes
+
+* **typings:** fix typings import reference ([32eeaf5](https://github.com/mister-what/regexpstructor/commit/32eeaf5edfb9ace63fe9a8018033cb77c4e022d0))
+
 ## [1.1.1](https://github.com/mister-what/regexpstructor/compare/v1.1.0...v1.1.1) (2021-03-16)
 
 
