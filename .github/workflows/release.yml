@@ -1,4 +1,4 @@
-name: Semantic Release
+name: Build
 on:
   repository_dispatch:
     types: [semantic-release]
