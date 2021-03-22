@@ -66,10 +66,10 @@ const uuid = digitBlock_8
 const regex = reStructor.compile();
 
 // use it:
-console.log(regex.test("a019bc3f-1234-5678-9abc-def012345678")); // true
+regex.test("a019bc3f-1234-5678-9abc-def012345678"); // result: true
 
 // print it:
-console.log(`/${regex.source}/${regex.flags}`); // "/[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}/gi"
+console.log(regex); /* logs: /[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}/gi */
 ```
 
 ##
