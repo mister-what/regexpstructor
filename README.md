@@ -62,8 +62,8 @@ const uuid = digitBlock_8
   .withAnyCase() // make case insensitive
   .searchOneLine(); // single line search
 
-// compile the reStructor into a regExp
-const regex = reStructor.compile();
+// compile the uuid reStructor into a regExp
+const regex = uuid.compile();
 
 // use it:
 regex.test("a019bc3f-1234-5678-9abc-def012345678"); // result: true
