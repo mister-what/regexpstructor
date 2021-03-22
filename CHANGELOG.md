@@ -1,3 +1,10 @@
+## [1.1.4](https://github.com/mister-what/regexpstructor/compare/v1.1.3...v1.1.4) (2021-03-22)
+
+
+### Bug Fixes
+
+* **example:** fix readme example ([91e066d](https://github.com/mister-what/regexpstructor/commit/91e066d3d4016d2c66d319e93f1a87bda966e967))
+
 ## [1.1.3](https://github.com/mister-what/regexpstructor/compare/v1.1.2...v1.1.3) (2021-03-22)
 
 
