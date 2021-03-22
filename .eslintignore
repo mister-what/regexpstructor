@@ -1,0 +1,9 @@
+node_modules/
+*.cjs
+jest.config.js
+release.config.js
+*.bs.js
+.eslintrc.js
+coverage
+dist
+lib

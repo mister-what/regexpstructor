@@ -1,0 +1,4 @@
+*.bs.js
+lib
+dist
+node_modules

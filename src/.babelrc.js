@@ -20,6 +20,7 @@ module.exports = (api) => {
       : [],
     plugins: [
       //["babel-plugin-polyfill-corejs3", { method: "usage-pure" }],
+      "@babel/plugin-proposal-class-properties",
       "babel-plugin-macros",
     ],
   };

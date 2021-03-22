@@ -1,58 +1,45 @@
+import { pipe } from "fast-fp.macro";
+
 import {
-  createRoot,
-  flags_to_opt_string,
-  then_,
-  or_,
-  maybe,
+  addFlags,
+  alt,
   anyOf,
   anything,
   anythingBut,
-  something,
-  somethingBut,
-  someOf,
-  ranges,
-  zeroOrMore,
+  createRoot,
+  digit,
+  empty,
+  flags_to_opt_string,
+  followedBy,
   getNode,
-  repeatExact,
+  group,
+  hasFlag,
+  linebreak,
+  maybe,
+  notFollowedBy,
+  oneOf,
+  oneOrMore,
+  or_,
+  ranges,
+  removeFlags,
   repeat,
+  repeatExact,
+  seq,
   setNode,
   setPrefix,
   setSuffix,
-  addFlags,
-  removeFlags,
-  alt,
-  seq,
-  whitespace,
-  linebreak,
-  digit,
-  empty,
+  someOf,
+  something,
+  somethingBut,
   tab,
+  then_,
+  whitespace,
   word,
-  followedBy,
-  notFollowedBy,
-  oneOrMore,
-  oneOf,
-  group,
-  hasFlag,
+  zeroOrMore,
 } from "./RegexAst.bs";
 import { stringify } from "./StringifyAst.bs";
-import ow from "ow";
-import { pipe } from "fast-fp.macro";
 
 const flatten = (...args) => args.flat(Infinity);
-
-const validate = (validator) => (arg) => (validator(arg), arg);
-
-const rangesValidator = ow.create(
-  "ranges",
-  ow.array.validate((arr) => ({
-    validator: arr.length % 2 === 0,
-    message: (label) =>
-      `Argument ${label} expected to have even number of elements, got ${arr.length}`,
-  }))
-);
-
-const validateRanges = validate(rangesValidator);
 
 const _makeRanges = (flatRanges) => {
   const rangePairs = new Array(flatRanges.length / 2);
@@ -64,7 +51,13 @@ const _makeRanges = (flatRanges) => {
   }
   return rangePairs;
 };
-const makeRanges = pipe(flatten, validateRanges, _makeRanges);
+
+const makeRanges = pipe(
+  flatten,
+  (flatRanges) =>
+    flatRanges.length % 2 === 0 ? flatRanges : flatRanges.slice(0, -1),
+  _makeRanges
+);
 
 const EXISTING_INSTANCES_KEY = "$7a3afcebc18ce55fe6f8445324d27b6e$";
 
@@ -306,10 +299,7 @@ class RegExpstructor {
     return RegExpstructor.from(
       setNode(
         setSuffix(this.#rootNode, ""),
-        then_(
-          getNode(this.#rootNode),
-          RegExpstructor.of(value).#rootNode.node
-        )
+        then_(getNode(this.#rootNode), RegExpstructor.of(value).#rootNode.node)
       )
     );
   }
@@ -324,10 +314,7 @@ class RegExpstructor {
     return RegExpstructor.from(
       setNode(
         setSuffix(this.#rootNode, ""),
-        maybe(
-          getNode(this.#rootNode),
-          RegExpstructor.of(value).#rootNode.node
-        )
+        maybe(getNode(this.#rootNode), RegExpstructor.of(value).#rootNode.node)
       )
     );
   }
@@ -342,10 +329,7 @@ class RegExpstructor {
     return RegExpstructor.from(
       setNode(
         this.#rootNode,
-        or_(
-          getNode(this.#rootNode),
-          RegExpstructor.of(value).#rootNode.node
-        )
+        or_(getNode(this.#rootNode), RegExpstructor.of(value).#rootNode.node)
       )
     );
   }
@@ -749,17 +733,9 @@ class RegExpstructor {
 existingClasses.push(RegExpstructor);
 
 RegExpstructor.prototype.group = RegExpstructor.prototype.capture;
-RegExpstructor.prototype.followedBy =
-  RegExpstructor.prototype.assertFollowedBy;
+RegExpstructor.prototype.followedBy = RegExpstructor.prototype.assertFollowedBy;
 RegExpstructor.prototype.notFollowedBy =
   RegExpstructor.prototype.assertNotFollowedBy;
-
-const makeValueDescriptor = (value) => ({
-  value,
-  writeable: false,
-  enumerable: true,
-  configurable: true,
-});
 
 class Warning extends Error {
   constructor(msg) {
