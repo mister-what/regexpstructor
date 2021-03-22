@@ -1,3 +1,7 @@
+[![Build](https://github.com/mister-what/regexpstructor/actions/workflows/release.yml/badge.svg?branch=main)](https://github.com/mister-what/regexpstructor/actions/workflows/release.yml)
+
+# RegExpStructor
+
 > Build regular expressions via a fluent api
 
 ## Highlights
