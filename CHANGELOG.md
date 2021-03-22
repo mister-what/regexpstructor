@@ -1,3 +1,10 @@
+## [1.1.3](https://github.com/mister-what/regexpstructor/compare/v1.1.2...v1.1.3) (2021-03-22)
+
+
+### Performance Improvements
+
+* **dependencies:** get rid of runtime dependencies ([6274b92](https://github.com/mister-what/regexpstructor/commit/6274b922ba81dab9ca82b8e880dccf8bc07ce011))
+
 ## [1.1.2](https://github.com/mister-what/regexpstructor/compare/v1.1.1...v1.1.2) (2021-03-18)
 
 

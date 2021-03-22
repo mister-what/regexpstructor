@@ -1,6 +1,6 @@
 {
   "name": "regexpstructor",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "Build regular expressions in a safe and readable way.",
   "keywords": [
     "VerbalExpressions",
