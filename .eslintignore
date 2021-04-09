@@ -7,3 +7,5 @@ release.config.js
 coverage
 dist
 lib
+esbuild.mjs
+rollup.config.js

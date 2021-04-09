@@ -39,9 +39,17 @@ import {
 } from "./RegexAst.bs";
 import { stringify } from "./StringifyAst.bs";
 
-const flatten = (...args) => args.flat(Infinity);
+interface Node<T> {}
+interface RootNode<T> {
+  prefix?: string;
+  suffix?: string;
+  node: Node<T>;
+  flags?: string;
+}
 
-const _makeRanges = (flatRanges) => {
+const flatten = <Args extends any[]>(...args: Args) => args.flat(Infinity);
+
+const _makeRanges = (flatRanges: string[]): [string, string][] => {
   const rangePairs = new Array(flatRanges.length / 2);
   for (let i = 0, j = 0; i < flatRanges.length; i += 2, j += 1) {
     rangePairs[j] = [
@@ -54,14 +62,15 @@ const _makeRanges = (flatRanges) => {
 
 const makeRanges = pipe(
   flatten,
-  (flatRanges) =>
+  (flatRanges: string[]) =>
     flatRanges.length % 2 === 0 ? flatRanges : flatRanges.slice(0, -1),
   _makeRanges
 );
 
 const EXISTING_INSTANCES_KEY = "$7a3afcebc18ce55fe6f8445324d27b6e$";
 
-const existingClasses =
+const existingClasses: typeof RegExpstructor[] =
+  // @ts-ignore
   RegExp.prototype[Symbol.for(EXISTING_INSTANCES_KEY)] || [];
 
 Object.defineProperty(RegExp.prototype, Symbol.for(EXISTING_INSTANCES_KEY), {
@@ -71,41 +80,36 @@ Object.defineProperty(RegExp.prototype, Symbol.for(EXISTING_INSTANCES_KEY), {
   value: existingClasses,
 });
 
-const isInstanceOfExisting = (obj) =>
-  existingClasses.find((Class) => obj instanceof Class);
+const isInstanceOfExisting = (obj: unknown) =>
+  existingClasses.find((Class) => obj instanceof Class) != null;
 
-const isInstance = (obj) => {
+const isInstance = (obj: unknown): obj is RegExpstructor => {
   if (obj == null) return false;
   return obj instanceof RegExpstructor || isInstanceOfExisting(obj);
 };
 
-/**
- * @template T
- * @typedef {T} Node opaque type
- * @typedef {{prefix?: string, suffix?: string, node: Node, flags?: string }} RootNode
- */
-/**
- * @class RegExpstructor
- * @namespace RegExpstructor
- */
+interface ConstructorArg {
+  source?: string;
+  node?: Node<never>;
+  flags?: string;
+  prefix?: string;
+  suffix?: string;
+  sanitize?: boolean;
+}
+
+type ReadablePrimitive = RegExpstructor;
+
 class RegExpstructor {
-  #rootNode;
-  /**
-   * @description Creates an instance of RegExpstructor.
-   * @constructor
-   * @memberOf RegExpstructor
-   *
-   * @param {{
-   *   source?:string,
-   *   node?: Node<never>,
-   *   flags?:string,
-   *   prefix?: string,
-   *   suffix?: string,
-   *   sanitize?: boolean
-   * }} [arg]
-   * @param {boolean} [init]
-   */
-  constructor(arg, init = true) {
+  #rootNode!: RootNode<never>;
+  group!: (name: string) => RegExpstructor;
+  followedBy!: (
+    value: string | number | RegExp | RegExpstructor
+  ) => RegExpstructor;
+  notFollowedBy!: (
+    value: string | number | RegExp | RegExpstructor
+  ) => RegExpstructor;
+
+  constructor(arg?: ConstructorArg, init: boolean = true) {
     if (init) {
       const { source, node, flags, prefix, suffix, sanitize } = arg ?? {};
       this.#rootNode = createRoot({
@@ -119,11 +123,10 @@ class RegExpstructor {
     }
   }
 
-  static #getRootNode = (x) => {
+  private static _getRootNode = (x: unknown): RootNode<never> => {
     if (!isInstance(x))
       throw new Error(`${x} is not an instance of RegExpstructor`);
-    function _getNode() {
-      // noinspection JSPotentiallyInvalidUsageOfClassThis
+    function _getNode(this: RegExpstructor): RootNode<never> {
       return this.#rootNode;
     }
     return _getNode.call(x);
@@ -131,104 +134,86 @@ class RegExpstructor {
 
   /**
    * @description creates a ReStructor from a rootNode type
-   * @param {RootNode} node
-   * @returns {RegExpstructor}
-   * @memberOf RegExpstructor
+   * @param node
    */
-  static from(node) {
+  static from(node: RootNode<never>): RegExpstructor {
     return new this(node);
   }
 
   /**
    * @description creates ReStructors from a variety of source formats
-   * @param {String|Number|RegExp|RegExpstructor} x
-   * @returns {RegExpstructor}
-   * @memberOf RegExpstructor
+   * @param x
    */
-  static of(x) {
+  static of(x: string | number | RegExp | RegExpstructor): RegExpstructor {
     if (x instanceof this) {
       return x;
     }
     if (isInstance(x)) {
-      return new this(this.#preSanitize(x.compile()));
+      return new this(this._preSanitize(x.compile()));
     }
-    const params = this.#preSanitize(x);
+    const params = this._preSanitize(x);
     return new this(params);
   }
 
   /**
    * @description disjunction (one must match) between the argument expressions
-   * @param {...(String|Number|RegExp|RegExpstructor)} xs
-   * @returns {RegExpstructor}
-   * @memberOf RegExpstructor
+   * @param xs
    */
-  static or(...xs) {
+  static or(
+    ...xs: (string | number | RegExp | RegExpstructor)[]
+  ): RegExpstructor {
     const verbals = xs.map((x) => {
       if (isInstance(x)) return x;
       return RegExpstructor.of(x);
     });
 
-    const nodes = verbals.map((x) => this.#getRootNode(x).node);
+    const nodes = verbals.map((x) => this._getRootNode(x).node);
     return this.from({ node: alt(nodes) });
   }
 
   /**
    * @description conjunction (all must match) of the argument expressions
-   * @param {...(String|Number|RegExp|RegExpstructor)} xs
-   * @returns {RegExpstructor}
-   * @memberOf RegExpstructor
+   * @param xs
    */
-  static seq(...xs) {
+  static seq(
+    ...xs: (string | number | RegExp | RegExpstructor)[]
+  ): RegExpstructor {
     const verbals = xs.map((x) => RegExpstructor.of(x));
-    const nodes = verbals.map((x) => this.#getRootNode(x).node);
+    const nodes = verbals.map((x) => this._getRootNode(x).node);
     return this.from({ node: seq(nodes) });
   }
 
   /**
-   * @description Alias for a class of primitive RegExpstructors (usually used as building blocks for more complex ReStructors)
-   * @typedef {RegExpstructor} ReadablePrimitive
-   */
-  /**
    * @description a ReStructor that matches a whitespace
-   * @type {ReadablePrimitive}
-   * @memberOf RegExpstructor
    */
-  static whitespace = new RegExpstructor({ node: whitespace });
+  static whitespace: ReadablePrimitive = new RegExpstructor({
+    node: whitespace,
+  });
   /**
    * @description an empty ReStructor
-   * @type {ReadablePrimitive}
-   * @memberOf RegExpstructor
    */
-  static empty = new RegExpstructor({ node: empty });
+  static empty: ReadablePrimitive = new RegExpstructor({ node: empty });
   /**
    * @description match one digit
-   * @type {ReadablePrimitive}
-   * @memberOf RegExpstructor
    */
-  static digit = new RegExpstructor({ node: digit });
+  static digit: ReadablePrimitive = new RegExpstructor({ node: digit });
   /**
    * @description match a tab-character
-   * @type {ReadablePrimitive}
-   * @memberOf RegExpstructor
    */
-  static tab = new RegExpstructor({ node: tab });
+  static tab: ReadablePrimitive = new RegExpstructor({ node: tab });
   /**
    * @description matches a whole word
-   * @type {ReadablePrimitive}
-   * @memberOf RegExpstructor
    */
-  static word = new RegExpstructor({ node: word });
+  static word: ReadablePrimitive = new RegExpstructor({ node: word });
   /**
    * @description match any kind of line break or new-lines
-   * @type {ReadablePrimitive}
-   * @memberOf RegExpstructor
    */
-  static linebreak = new RegExpstructor({ node: linebreak });
+  static linebreak: ReadablePrimitive = new RegExpstructor({ node: linebreak });
   static any = new RegExpstructor({ node: something(empty) });
 
   // Utility //
 
-  static #preSanitize = (value) => {
+  private static _preSanitize = (value: unknown) => {
     if (value instanceof RegExp) {
       const source = value.source === "(?:)" ? "" : value.source;
       const prefix = source.startsWith("^") ? "^" : "";
@@ -256,13 +241,13 @@ class RegExpstructor {
     };
   };
 
-  #setPrefix = (prefix) => {
-    const newInstance = new RegExpstructor(null, false);
+  #setPrefix = (prefix: string) => {
+    const newInstance = new RegExpstructor(void 0, false);
     newInstance.#rootNode = setPrefix(this.#rootNode, prefix);
     return newInstance;
   };
-  #setSuffix = (suffix) => {
-    const newInstance = new RegExpstructor(null, false);
+  #setSuffix = (suffix: string) => {
+    const newInstance = new RegExpstructor(void 0, false);
     newInstance.#rootNode = setSuffix(this.#rootNode, suffix);
     return newInstance;
   };
@@ -271,31 +256,25 @@ class RegExpstructor {
 
   /**
    * @description Control start-of-line matching
-   * @param {boolean} [enable=true] whether to enable this behaviour
-   * @returns {RegExpstructor} new RegExpstructor
-   * @memberOf RegExpstructor#
+   * @param [enable=true] whether to enable this behaviour
    */
-  assertStartOfLine(enable = true) {
+  assertStartOfLine(enable: boolean = true): RegExpstructor {
     return this.#setPrefix(enable ? "^" : "");
   }
 
   /**
    * @description Control end-of-line matching
-   * @param {boolean} [enable=true] whether to enable this behaviour
-   * @returns {RegExpstructor} new RegExpstructor
-   * @memberOf RegExpstructor#
+   * @param [enable=true] whether to enable this behaviour
    */
-  assertEndOfLine(enable = true) {
+  assertEndOfLine(enable: boolean = true): RegExpstructor {
     return this.#setSuffix(enable ? "$" : "");
   }
 
   /**
    * @description Look for the value passed
-   * @param {(string|RegExp|number|RegExpstructor)} value value to find
-   * @returns {RegExpstructor} new RegExpstructor
-   * @memberOf RegExpstructor#
+   * @param value value to find
    */
-  then(value) {
+  then(value: string | RegExp | number | RegExpstructor): RegExpstructor {
     return RegExpstructor.from(
       setNode(
         setSuffix(this.#rootNode, ""),
@@ -306,11 +285,9 @@ class RegExpstructor {
 
   /**
    * @description Add an optional branch for matching
-   * @param {(string|RegExp|number|RegExpstructor)} value value to find
-   * @returns {RegExpstructor} new RegExpstructor
-   * @memberOf RegExpstructor#
+   * @param value value to find
    */
-  maybe(value) {
+  maybe(value: string | RegExp | number | RegExpstructor): RegExpstructor {
     return RegExpstructor.from(
       setNode(
         setSuffix(this.#rootNode, ""),
@@ -321,11 +298,9 @@ class RegExpstructor {
 
   /**
    * @description Add alternative expressions
-   * @param {(string|RegExp|number|RegExpstructor)} value value to find
-   * @returns {RegExpstructor} new RegExpstructor
-   * @memberOf RegExpstructor#
+   * @param value value to find
    */
-  or(value) {
+  or(value: string | RegExp | number | RegExpstructor): RegExpstructor {
     return RegExpstructor.from(
       setNode(
         this.#rootNode,
@@ -336,11 +311,9 @@ class RegExpstructor {
 
   /**
    * @description Any character any number of times
-   * @param {boolean} [lazy] match least number of characters
-   * @returns {RegExpstructor} new RegExpstructor
-   * @memberOf RegExpstructor#
+   * @param lazy match least number of characters
    */
-  anything(lazy = false) {
+  anything(lazy: boolean = false): RegExpstructor {
     return RegExpstructor.from(
       setNode(this.#rootNode, anything(getNode(this.#rootNode), lazy))
     );
@@ -348,12 +321,13 @@ class RegExpstructor {
 
   /**
    * @description Anything but these characters
-   * @param {(string|number|string[]|number[])} value characters to not match
-   * @param {boolean} [lazy] match least number of characters
-   * @returns {RegExpstructor} new RegExpstructor
-   * @memberOf RegExpstructor#
+   * @param value characters to not match
+   * @param lazy match least number of characters
    */
-  anythingBut(value, lazy = false) {
+  anythingBut(
+    value: string | number | string[] | number[],
+    lazy: boolean = false
+  ): RegExpstructor {
     return RegExpstructor.from(
       setNode(
         this.#rootNode,
@@ -364,10 +338,8 @@ class RegExpstructor {
 
   /**
    * @description Any character(s) at least once
-   * @returns {RegExpstructor} new RegExpstructor
-   * @memberOf RegExpstructor#
    */
-  something() {
+  something(): RegExpstructor {
     return RegExpstructor.from(
       setNode(this.#rootNode, something(getNode(this.#rootNode)))
     );
@@ -375,11 +347,9 @@ class RegExpstructor {
 
   /**
    * @description Any character at least one time except for these characters
-   * @param {(string|number|string[]|number[])} value characters to not match
-   * @returns {RegExpstructor} new RegExpstructor
-   * @memberOf RegExpstructor#
+   * @param value characters to not match
    */
-  somethingBut(value) {
+  somethingBut(value: string | number | string[] | number[]): RegExpstructor {
     return RegExpstructor.from(
       setNode(
         this.#rootNode,
@@ -390,11 +360,9 @@ class RegExpstructor {
 
   /**
    * @description Match any of the given characters
-   * @param {(string|number|string[]|number[])} value characters to match
-   * @returns {RegExpstructor} new RegExpstructor
-   * @memberOf RegExpstructor#
+   * @param value characters to match
    */
-  anyOf(value) {
+  anyOf(value: string | number | string[] | number[]): RegExpstructor {
     return RegExpstructor.from(
       setNode(
         this.#rootNode,
@@ -405,10 +373,8 @@ class RegExpstructor {
   /**
    * @description Match some of the given characters
    * @param {(string|number|string[]|number[])} value characters to match
-   * @returns {RegExpstructor} new RegExpstructor
-   * @memberOf RegExpstructor#
    */
-  someOf(value) {
+  someOf(value: string | number | string[] | number[]): RegExpstructor {
     return RegExpstructor.from(
       setNode(
         this.#rootNode,
@@ -420,10 +386,8 @@ class RegExpstructor {
   /**
    * @description Match one chartacter of the given characters
    * @param {(string|number|string[]|number[])} value characters to match
-   * @returns {RegExpstructor} new RegExpstructor
-   * @memberOf RegExpstructor#
    */
-  oneOf(value) {
+  oneOf(value: string | number | string[] | number[]): RegExpstructor {
     return RegExpstructor.from(
       setNode(
         this.#rootNode,
@@ -435,20 +399,18 @@ class RegExpstructor {
   /**
    * @description Shorthand for anyOf(value)
    * @param {string|number} value value to find
-   * @returns {RegExpstructor} new RegExpstructor
-   * @memberOf RegExpstructor#
    */
-  any(value) {
+  any(value: string | number): RegExpstructor {
     return this.anyOf(value);
   }
 
   /**
    * @description Ensure that the parameter does not follow (negative lookahead)
    * @param {string|number|RegExp|RegExpstructor} value
-   * @returns {RegExpstructor} new RegExpstructor
-   * @memberOf RegExpstructor#
    */
-  assertNotFollowedBy(value) {
+  assertNotFollowedBy(
+    value: string | number | RegExp | RegExpstructor
+  ): RegExpstructor {
     return RegExpstructor.from(
       setNode(
         this.#rootNode,
@@ -462,10 +424,10 @@ class RegExpstructor {
   /**
    * @description Ensure that the parameter does follow (positive lookahead)
    * @param {string|number|RegExp|RegExpstructor} value
-   * @returns {RegExpstructor} new RegExpstructor
-   * @memberOf RegExpstructor#
    */
-  assertFollowedBy(value) {
+  assertFollowedBy(
+    value: string | number | RegExp | RegExpstructor
+  ): RegExpstructor {
     return RegExpstructor.from(
       setNode(
         this.#rootNode,
@@ -481,10 +443,10 @@ class RegExpstructor {
    * @description Match any character in these ranges
    * @example RegExpstructor.empty.charOfRanges(["a","z"], ["0", "9"]) // [a-z0-9]
    * @param {...([string, string])} characterRanges total number of elements must be event
-   * @returns {RegExpstructor}
-   * @memberOf RegExpstructor#
+   *
+   *
    */
-  charOfRanges(...characterRanges) {
+  charOfRanges(...characterRanges: [string, string][]): RegExpstructor {
     return RegExpstructor.from(
       setNode(
         this.#rootNode,
@@ -496,10 +458,10 @@ class RegExpstructor {
    * @description Match any character that is not in these ranges
    * @example RegExpstructor.empty.charNotOfRanges(["a","z"], ["0", "9"]) // [^a-z0-9]
    * @param {...([string, string])} characterRanges total number of elements must be event
-   * @returns {RegExpstructor}
-   * @memberOf RegExpstructor#
+   *
+   *
    */
-  charNotOfRanges(...characterRanges) {
+  charNotOfRanges(...characterRanges: [string, string][]): RegExpstructor {
     return RegExpstructor.from(
       setNode(
         this.#rootNode,
@@ -512,55 +474,43 @@ class RegExpstructor {
 
   /**
    * @description Match a Line break
-   * @returns {RegExpstructor} new RegExpstructor
-   * @memberOf RegExpstructor#
    */
-  lineBreak() {
+  lineBreak(): RegExpstructor {
     return this.then(RegExpstructor.linebreak);
   }
 
   /**
    * @description A shorthand for lineBreak() for html-minded users
-   * @returns {RegExpstructor} new RegExpstructor
-   * @memberOf RegExpstructor#
    */
-  br() {
+  br(): RegExpstructor {
     return this.lineBreak();
   }
 
   /**
    * @description Match a tab character
-   * @returns {RegExpstructor} new RegExpstructor
-   * @memberOf RegExpstructor#
    */
-  tab() {
+  tab(): RegExpstructor {
     return this.then(RegExpstructor.tab);
   }
 
   /**
    * @description Match any alphanumeric sequence
-   * @returns {RegExpstructor} new RegExpstructor
-   * @memberOf RegExpstructor#
    */
-  word() {
+  word(): RegExpstructor {
     return this.then(RegExpstructor.word);
   }
 
   /**
    * @description Match a single digit
-   * @returns {RegExpstructor} new RegExpstructor
-   * @memberOf RegExpstructor#
    */
-  digit() {
+  digit(): RegExpstructor {
     return this.then(RegExpstructor.digit);
   }
 
   /**
    * @description Match a single whitespace
-   * @returns {RegExpstructor} new RegExpstructor
-   * @memberOf RegExpstructor#
    */
-  whitespace() {
+  whitespace(): RegExpstructor {
     return this.then(RegExpstructor.whitespace);
   }
 
@@ -568,19 +518,15 @@ class RegExpstructor {
   /**
    * @description Add a regex flag - default flags are: "gi"
    * @param {string} flag
-   * @returns {RegExpstructor} new RegExpstructor
-   * @memberOf RegExpstructor#
    */
-  addFlag(flag = "") {
+  addFlag(flag: string = ""): RegExpstructor {
     return RegExpstructor.from(addFlags(this.#rootNode, flag));
   }
   /**
    * @description Remove a regex flag - default flags are: "gi"
    * @param {string} flag
-   * @returns {RegExpstructor} new RegExpstructor
-   * @memberOf RegExpstructor#
    */
-  removeFlag(flag) {
+  removeFlag(flag: string): RegExpstructor {
     return RegExpstructor.from(removeFlags(this.#rootNode, flag));
   }
 
@@ -589,52 +535,46 @@ class RegExpstructor {
    * @param {string} flag
    * @returns {boolean}
    */
-  hasFlag(flag) {
+  hasFlag(flag: string): boolean {
     return hasFlag(this.#rootNode, flag);
   }
 
   /**
    * @description Adds an "i" regex flag - default flags are: "gm"
-   * @param {boolean=true} enable
-   * @returns {RegExpstructor} new RegExpstructor
-   * @memberOf RegExpstructor#
+   * @param enable
    */
-  withAnyCase(enable = true) {
+  withAnyCase(enable = true): RegExpstructor {
     return enable ? this.addFlag("i") : this.removeFlag("i");
   }
   /**
    * @description Removes a "g" regex flag - default flags are: "gm"
-   * @param {boolean=true} enable `true` means no "g" flag
-   * @returns {RegExpstructor} new RegExpstructor
-   * @memberOf RegExpstructor#
+   * @param enable `true` means no "g" flag
    */
-  stopAtFirst(enable = true) {
+  stopAtFirst(enable = true): RegExpstructor {
     return !enable ? this.addFlag("g") : this.removeFlag("g");
   }
   /**
    *
-   * @param {boolean=true} enable
-   * @returns {RegExpstructor}
+   * @param enable
+   *
    */
-  global(enable = true) {
+  global(enable = true): RegExpstructor {
     return enable ? this.addFlag("g") : this.removeFlag("g");
   }
   /**
    *
-   * @param {string} flag
-   * @returns {RegExpstructor}
+   * @param flag
+   *
    */
-  toggleFlag(flag) {
+  toggleFlag(flag: string): RegExpstructor {
     return !this.hasFlag(flag) ? this.addFlag(flag) : this.removeFlag(flag);
   }
 
   /**
    * @description Removes any set "m" regex flag - default flags are: "gm"
-   * @param {boolean=true} enable `true` means "m" flag will be removed
-   * @returns {RegExpstructor} new RegExpstructor
-   * @memberOf RegExpstructor#
+   * @param enable `true` means "m" flag will be removed
    */
-  searchOneLine(enable = true) {
+  searchOneLine(enable = true): RegExpstructor {
     return enable ? this.removeFlag("m") : this.addFlag("m");
   }
 
@@ -644,12 +584,10 @@ class RegExpstructor {
    * @example ```js
    * Sx("abc").whitespace().repeat(2, 4).compile().toString() === /(?:abc\w){2,4}/gm.toString()
    * ```
-   * @param {number} min
-   * @param {number} max
-   * @returns {RegExpstructor}
-   * @memberOf RegExpstructor#
+   * @param min
+   * @param max
    */
-  repeat(min, max) {
+  repeat(min: number, max: number): RegExpstructor {
     return RegExpstructor.from(
       setNode(
         this.#rootNode,
@@ -666,11 +604,9 @@ class RegExpstructor {
    * @example ```js
    * Sx("abc").whitespace().repeatExactly(5).compile().toString() === /(?:abc\w){5}/gm.toString()
    * ```
-   * @param {number} n must be > 0
-   * @returns {RegExpstructor}
-   * @memberOf RegExpstructor#
+   * @param n must be > 0
    */
-  repeatExactly(n) {
+  repeatExactly(n: number): RegExpstructor {
     return RegExpstructor.from(
       setNode(
         this.#rootNode,
@@ -681,10 +617,9 @@ class RegExpstructor {
 
   /**
    * @description the expression should match at least once
-   * @returns {RegExpstructor}
-   * @memberOf RegExpstructor#
+   *
    */
-  oneOrMore() {
+  oneOrMore(): RegExpstructor {
     return RegExpstructor.from(
       setNode(this.#rootNode, oneOrMore(getNode(this.#rootNode)))
     );
@@ -692,24 +627,20 @@ class RegExpstructor {
 
   /**
    * @description the expression should match zero or more times
-   * @param {boolean} [lazy] enable lazy (non greedy) matching
-   * @returns {RegExpstructor}
-   * @memberOf RegExpstructor#
+   * @param lazy enable lazy (non greedy) matching
    */
-  zeroOrMore(lazy) {
+  zeroOrMore(lazy: boolean): RegExpstructor {
     return RegExpstructor.from(
-      setNode(this.#rootNode, zeroOrMore(getNode(this.#rootNode)), lazy)
+      setNode(this.#rootNode, zeroOrMore(getNode(this.#rootNode), lazy))
     );
   }
 
   // Capture groups //
   /**
    *
-   * @param {string} [name] optionally name your capturing group
-   * @returns {RegExpstructor}
-   * @memberOf RegExpstructor#
+   * @param name optionally name your capturing group
    */
-  capture(name) {
+  capture(name: string): RegExpstructor {
     return RegExpstructor.from(
       setNode(
         this.#rootNode,
@@ -721,10 +652,9 @@ class RegExpstructor {
   // Miscellaneous //
   /**
    * @description compile the ReStructor to a RegExp
-   * @returns {RegExp}
-   * @memberOf RegExpstructor#
+   *
    */
-  compile() {
+  compile(): RegExp {
     const { source, flags } = stringify(this.#rootNode);
     return new RegExp(source, flags);
   }
@@ -738,18 +668,22 @@ RegExpstructor.prototype.notFollowedBy =
   RegExpstructor.prototype.assertNotFollowedBy;
 
 class Warning extends Error {
-  constructor(msg) {
+  constructor(msg: string) {
     super(msg);
     this.name = "Warning";
   }
 }
-const writeWarning = (text, logType = "error") => {
+const writeWarning = (text: string, logType = "error") => {
   return warn;
   function warn() {
+    // @ts-ignore
     if (!warn.warned) {
+      // @ts-ignore
       warn.warned = true;
+      // @ts-ignore
       (typeof console[logType] === "function"
-        ? console[logType]
+        ? // @ts-ignore
+          console[logType]
         : console.error)(new Warning(text));
     }
   }
@@ -761,9 +695,11 @@ const warnArgType = writeWarning(
 /**
  *
  * @param {string|number|RegExp|RegExpstructor} [value]
- * @returns {RegExpstructor}
+ *
  */
-export default function ReStructor(value) {
+export default function ReStructor(
+  value: string | number | RegExp | RegExpstructor
+): RegExpstructor {
   const valueType = typeof value;
   if (
     value != null &&
