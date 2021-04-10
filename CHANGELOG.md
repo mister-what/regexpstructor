@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/mister-what/regexpstructor/compare/v1.2.0...v1.2.1) (2021-04-10)
+
+
+### Bug Fixes
+
+* **dependencies:** move typescript to devDependencies ([1a87dc8](https://github.com/mister-what/regexpstructor/commit/1a87dc85356929da623754c7ee1980a3c55daa8f))
+
 # [1.2.0](https://github.com/mister-what/regexpstructor/compare/v1.1.4...v1.2.0) (2021-04-10)
 
 

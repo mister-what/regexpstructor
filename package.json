@@ -1,6 +1,6 @@
 {
   "name": "regexpstructor",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Build regular expressions in a safe and readable way.",
   "keywords": [
     "VerbalExpressions",
@@ -49,8 +49,7 @@
   "bugs": {
     "url": "https://github.com/mister-what/regexpstructor/issues"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "@babel/cli": "^7.13.10",
     "@babel/core": "^7.13.10",
