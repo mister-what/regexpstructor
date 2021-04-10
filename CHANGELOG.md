@@ -1,3 +1,11 @@
+# [1.2.0](https://github.com/mister-what/regexpstructor/compare/v1.1.4...v1.2.0) (2021-04-10)
+
+
+### Features
+
+* **implementation:** migrate to typescript ([3167d40](https://github.com/mister-what/regexpstructor/commit/3167d409a5f97fbe9fd103f58fb856ef5a620d02))
+* **typescript:** migrate to typescript ([9909317](https://github.com/mister-what/regexpstructor/commit/9909317abda4f21296f522bf67263daed965c7ac))
+
 ## [1.1.4](https://github.com/mister-what/regexpstructor/compare/v1.1.3...v1.1.4) (2021-03-22)
 
 
