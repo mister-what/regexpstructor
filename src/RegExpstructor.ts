@@ -101,13 +101,6 @@ type ReadablePrimitive = RegExpstructor;
 
 class RegExpstructor {
   #rootNode!: RootNode<never>;
-  group!: (name: string) => RegExpstructor;
-  followedBy!: (
-    value: string | number | RegExp | RegExpstructor
-  ) => RegExpstructor;
-  notFollowedBy!: (
-    value: string | number | RegExp | RegExpstructor
-  ) => RegExpstructor;
 
   constructor(arg?: ConstructorArg, init: boolean = true) {
     if (init) {
@@ -421,6 +414,17 @@ class RegExpstructor {
       )
     );
   }
+
+  /**
+   * @description Ensure that the parameter does not follow (negative lookahead)
+   * @param {string|number|RegExp|RegExpstructor} value
+   */
+  notFollowedBy(
+    value: string | number | RegExp | RegExpstructor
+  ): RegExpstructor {
+    return this.assertNotFollowedBy(value);
+  }
+
   /**
    * @description Ensure that the parameter does follow (positive lookahead)
    * @param {string|number|RegExp|RegExpstructor} value
@@ -437,6 +441,13 @@ class RegExpstructor {
         )
       )
     );
+  }
+  /**
+   * @description Ensure that the parameter does follow (positive lookahead)
+   * @param {string|number|RegExp|RegExpstructor} value
+   */
+  followedBy(value: string | number | RegExp | RegExpstructor): RegExpstructor {
+    return this.assertFollowedBy(value);
   }
 
   /**
@@ -561,6 +572,7 @@ class RegExpstructor {
   global(enable = true): RegExpstructor {
     return enable ? this.addFlag("g") : this.removeFlag("g");
   }
+
   /**
    *
    * @param flag
@@ -599,6 +611,7 @@ class RegExpstructor {
       )
     );
   }
+
   /**
    * @description match the expression exactly <n> times
    * @example ```js
@@ -649,6 +662,14 @@ class RegExpstructor {
     );
   }
 
+  /**
+   *
+   * @param name optionally name your capturing group
+   */
+  group(name: string): RegExpstructor {
+    return this.capture(name);
+  }
+
   // Miscellaneous //
   /**
    * @description compile the ReStructor to a RegExp
@@ -662,8 +683,6 @@ class RegExpstructor {
 
 existingClasses.push(RegExpstructor);
 
-RegExpstructor.prototype.group = RegExpstructor.prototype.capture;
-RegExpstructor.prototype.followedBy = RegExpstructor.prototype.assertFollowedBy;
 RegExpstructor.prototype.notFollowedBy =
   RegExpstructor.prototype.assertNotFollowedBy;
 

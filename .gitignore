@@ -9,5 +9,5 @@ lib
 .env
 .npmrc
 .eslintcache
-
+types
 typings

@@ -1,4 +1,4 @@
-import ReStructor from "../src";
+import ReStructor from "../dist/index.cjs";
 
 test("should build a uuid regexp via RegExpstructors", () => {
   const hexBlock = ReStructor().charOfRanges(["0", "9"], ["a", "f"]);

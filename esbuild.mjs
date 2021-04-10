@@ -1,11 +1,14 @@
 import esbuild from "esbuild";
 import babel from "esbuild-plugin-babel";
+import Module from "module";
+
+const require = Module.createRequire(import.meta.url);
 
 const build = ({ format, extension, env = { NODE_ENV: "development" } }) =>
   esbuild.build({
     format,
     bundle: true,
-    entryPoints: ["src/index.js"],
+    entryPoints: [`src/index.${extension}`],
     outExtension: { ".js": `.${extension}` },
     outdir: "dist",
     target: ["node6"],
@@ -14,9 +17,19 @@ const build = ({ format, extension, env = { NODE_ENV: "development" } }) =>
         config: {
           babelrc: false,
           configFile: false,
-          presets: [],
+          presets: [
+            [
+              require.resolve("@babel/preset-typescript"),
+              {
+                allowNamespaces: true,
+                allowDeclareFields: true,
+                onlyRemoveTypeImports: true,
+              },
+            ],
+          ],
           plugins: [
             require.resolve("@babel/plugin-proposal-class-properties"),
+            require.resolve("@babel/plugin-transform-destructuring"),
             require.resolve("@babel/plugin-proposal-private-methods"),
             require.resolve("babel-plugin-macros"),
           ],
@@ -29,7 +42,7 @@ const build = ({ format, extension, env = { NODE_ENV: "development" } }) =>
           `process.env.${envVar}`,
           JSON.stringify(value),
         ]),
-        ["__DEV__", JSON.stringify(env.NODE_ENV !== "production")],
+        [["__DEV__", JSON.stringify(env.NODE_ENV !== "production")]],
       ].flat()
     ),
     // minify: true,
