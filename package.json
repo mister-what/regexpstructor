@@ -42,7 +42,6 @@
     "build:dts": "run-s 'build:dts:*'",
     "build": "run-s 'build:*'",
     "prepack": "npm-run-all -s clean build",
-    "pretest": "npm run lint && npm run build:esbuild",
     "test": "jest",
     "lint": "eslint . --cache --fix",
     "postinstall": "husky install",
