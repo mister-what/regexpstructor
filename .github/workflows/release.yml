@@ -1,33 +1,17 @@
-name: Build
+name: Make Release
 on:
-  repository_dispatch:
-    types: [semantic-release]
   workflow_dispatch:
 
-  push:
-    branches:
-      - main
 jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Cache yarn-offline-mirror
-        uses: actions/cache@v2
-        env:
-          cache-name: yarn-offline-mirror
-        with:
-          path: ./.yarn/cache
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('./yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v2
         with:
           node-version: 17
-      - run: npm i -g yarn
+          cache: yarn
       - run: yarn --immutable
       - env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
