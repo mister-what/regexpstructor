@@ -1,3 +1,10 @@
+## [1.2.2](https://github.com/mister-what/regexpstructor/compare/v1.2.1...v1.2.2) (2021-12-02)
+
+
+### Bug Fixes
+
+* **typings:** fix method argument types ([6d6014b](https://github.com/mister-what/regexpstructor/commit/6d6014be1c61074c0dc50df40224482e9d72e08e))
+
 ## [1.2.1](https://github.com/mister-what/regexpstructor/compare/v1.2.0...v1.2.1) (2021-04-10)
 
 
