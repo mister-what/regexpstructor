@@ -9,3 +9,5 @@ dist
 lib
 esbuild.mjs
 rollup.config.js
+typings
+types

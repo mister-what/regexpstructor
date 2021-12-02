@@ -1,4 +1,4 @@
-import ReStructor from "../dist/index.cjs";
+import ReStructor from "../src";
 
 test("should build a uuid regexp via RegExpstructors", () => {
   const hexBlock = ReStructor().charOfRanges(["0", "9"], ["a", "f"]);
@@ -14,6 +14,7 @@ test("should build a uuid regexp via RegExpstructors", () => {
     `"/[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}/gi"`
   );
 });
+
 test("should build regexp via RegExpstructors", () => {
   const reStructor = ReStructor(/^test_expr$/)
     .maybe(ReStructor.whitespace)
@@ -46,9 +47,8 @@ test("should build regexp via RegExpstructors", () => {
   expect("test_expr hello World?").not.toMatch(regex);
   //
 });
-/*test("should build regexp", () => {
-  expect(mySource).toMatchInlineSnapshot(
-    `"Hello(?:\\\\s(?:\\\\r\\\\n|\\\\r|\\\\n))?(?:World|world)[!?.]"`
-  );
-  //
-});*/
+
+test("should result in empty regex when no constructor arg is specified", () => {
+  const { source, flags } = ReStructor().compile();
+  expect(`/${source}/${flags}`).toMatchInlineSnapshot(`"/(?:)/gm"`);
+});
