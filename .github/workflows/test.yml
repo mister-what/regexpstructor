@@ -19,7 +19,6 @@ jobs:
       with:
         node-version: 17
         cache: 'yarn'
-    - run: npm i -g yarn
     - run: yarn --immutable
     - name: Run tests
       run: yarn test
