@@ -40,6 +40,7 @@ import {
 import { stringify } from "./StringifyAst.bs";
 
 interface Node<T> {}
+
 interface RootNode<T> {
   prefix?: string;
   suffix?: string;
@@ -119,9 +120,11 @@ class RegExpstructor {
   private static _getRootNode = (x: unknown): RootNode<never> => {
     if (!isInstance(x))
       throw new Error(`${x} is not an instance of RegExpstructor`);
+
     function _getNode(this: RegExpstructor): RootNode<never> {
       return this.#rootNode;
     }
+
     return _getNode.call(x);
   };
 
@@ -306,7 +309,7 @@ class RegExpstructor {
    * @description Any character any number of times
    * @param lazy match least number of characters
    */
-  anything(lazy: boolean = false): RegExpstructor {
+  anything(lazy = false): RegExpstructor {
     return RegExpstructor.from(
       setNode(this.#rootNode, anything(getNode(this.#rootNode), lazy))
     );
@@ -319,7 +322,7 @@ class RegExpstructor {
    */
   anythingBut(
     value: string | number | string[] | number[],
-    lazy: boolean = false
+    lazy = false
   ): RegExpstructor {
     return RegExpstructor.from(
       setNode(
@@ -363,6 +366,7 @@ class RegExpstructor {
       )
     );
   }
+
   /**
    * @description Match some of the given characters
    * @param {(string|number|string[]|number[])} value characters to match
@@ -442,6 +446,7 @@ class RegExpstructor {
       )
     );
   }
+
   /**
    * @description Ensure that the parameter does follow (positive lookahead)
    * @param {string|number|RegExp|RegExpstructor} value
@@ -465,6 +470,7 @@ class RegExpstructor {
       )
     );
   }
+
   /**
    * @description Match any character that is not in these ranges
    * @example RegExpstructor.empty.charNotOfRanges(["a","z"], ["0", "9"]) // [^a-z0-9]
@@ -533,6 +539,7 @@ class RegExpstructor {
   addFlag(flag: string = ""): RegExpstructor {
     return RegExpstructor.from(addFlags(this.#rootNode, flag));
   }
+
   /**
    * @description Remove a regex flag - default flags are: "gi"
    * @param {string} flag
@@ -557,6 +564,7 @@ class RegExpstructor {
   withAnyCase(enable = true): RegExpstructor {
     return enable ? this.addFlag("i") : this.removeFlag("i");
   }
+
   /**
    * @description Removes a "g" regex flag - default flags are: "gm"
    * @param enable `true` means no "g" flag
@@ -564,6 +572,7 @@ class RegExpstructor {
   stopAtFirst(enable = true): RegExpstructor {
     return !enable ? this.addFlag("g") : this.removeFlag("g");
   }
+
   /**
    *
    * @param enable
@@ -642,7 +651,7 @@ class RegExpstructor {
    * @description the expression should match zero or more times
    * @param lazy enable lazy (non greedy) matching
    */
-  zeroOrMore(lazy: boolean): RegExpstructor {
+  zeroOrMore(lazy = false): RegExpstructor {
     return RegExpstructor.from(
       setNode(this.#rootNode, zeroOrMore(getNode(this.#rootNode), lazy))
     );
@@ -653,7 +662,7 @@ class RegExpstructor {
    *
    * @param name optionally name your capturing group
    */
-  capture(name: string): RegExpstructor {
+  capture(name?: string): RegExpstructor {
     return RegExpstructor.from(
       setNode(
         this.#rootNode,
@@ -666,7 +675,7 @@ class RegExpstructor {
    *
    * @param name optionally name your capturing group
    */
-  group(name: string): RegExpstructor {
+  group(name?: string): RegExpstructor {
     return this.capture(name);
   }
 
@@ -692,8 +701,10 @@ class Warning extends Error {
     this.name = "Warning";
   }
 }
+
 const writeWarning = (text: string, logType = "error") => {
   return warn;
+
   function warn() {
     // @ts-ignore
     if (!warn.warned) {
@@ -717,7 +728,7 @@ const warnArgType = writeWarning(
  *
  */
 export default function ReStructor(
-  value: string | number | RegExp | RegExpstructor
+  value?: string | number | RegExp | RegExpstructor
 ): RegExpstructor {
   const valueType = typeof value;
   if (
