@@ -11,3 +11,4 @@ lib
 .eslintcache
 types
 typings
+.DS_Store
