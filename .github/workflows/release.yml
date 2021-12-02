@@ -18,7 +18,7 @@ jobs:
         env:
           cache-name: yarn-offline-mirror
         with:
-          path: ./npm-packages-offline-cache
+          path: ./.yarn/cache
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('./yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
@@ -26,9 +26,9 @@ jobs:
             ${{ runner.os }}-
       - uses: actions/setup-node@v1
         with:
-          node-version: 15
+          node-version: 17
       - run: npm i -g yarn
-      - run: yarn --frozen-lockfile
+      - run: yarn --immutable
       - env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

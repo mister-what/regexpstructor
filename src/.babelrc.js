@@ -3,6 +3,7 @@ module.exports = (api) => {
     ignore: api.env("test") ? [] : ["./*.bs.js", "./**/*.bs.js"],
     presets: api.env("test")
       ? [
+          "@babel/preset-typescript",
           [
             "@babel/preset-env",
             {
@@ -17,7 +18,7 @@ module.exports = (api) => {
             },
           ],
         ]
-      : [],
+      : ["@babel/preset-typescript"],
     plugins: [
       //["babel-plugin-polyfill-corejs3", { method: "usage-pure" }],
       "@babel/plugin-proposal-class-properties",
