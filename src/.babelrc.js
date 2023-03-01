@@ -13,16 +13,12 @@ module.exports = (api) => {
                   }
                 : { browsers: ">1%, not IE < 11" },
               useBuiltIns: "usage",
-              corejs: "3.9",
+              corejs: "3.29",
               shippedProposals: true,
             },
           ],
         ]
       : ["@babel/preset-typescript"],
-    plugins: [
-      //["babel-plugin-polyfill-corejs3", { method: "usage-pure" }],
-      "@babel/plugin-proposal-class-properties",
-      "babel-plugin-macros",
-    ],
+    plugins: ["@babel/plugin-proposal-class-properties"],
   };
 };

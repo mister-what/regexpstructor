@@ -1,4 +1,4 @@
-import ReStructor from "../src";
+import ReStructor from "../src/RegExpstructor";
 
 test("should build a uuid regexp via RegExpstructors", () => {
   const hexBlock = ReStructor().charOfRanges(["0", "9"], ["a", "f"]);
@@ -28,21 +28,23 @@ test("should build regexp via RegExpstructors", () => {
 
   const regex = reStructor.compile();
   expect(regex.source).toMatchInlineSnapshot(
-    `"^(?:test_expr(?:\\\\s)?(?<hellos>(?:hello){1,3})){1,4}(?:\\\\s)+(?<worldGroup>world|World)?(?=!)."`
+    `"^(?:test_expr(?:\\s)?(?<hellos>(?:hello){1,3})){1,4}(?:\\s)+(?<worldGroup>world|World)?(?=!)."`
   );
   expect("test_expr hello World!".replace(regex, "")).toEqual("");
   expect("test_expr hello     World!".replace(regex, "")).toEqual("");
   expect("test_exprhello     world!".replace(regex, "")).toEqual("");
 
-  expect("test_expr hello World!".match(regex).groups.worldGroup).toEqual(
+  expect("test_expr hello World!".match(regex)?.groups?.worldGroup).toEqual(
     "World"
   );
-  expect("test_expr hello world!".match(regex).groups.worldGroup).toEqual(
+  expect("test_expr hello world!".match(regex)?.groups?.worldGroup).toEqual(
     "world"
   );
-  expect("test_expr hello World!".match(regex).groups.hellos).toEqual("hello");
+  expect("test_expr hello World!".match(regex)?.groups?.hellos).toEqual(
+    "hello"
+  );
   expect(
-    "test_expr hellotest_expr hellohello World!".match(regex).groups.hellos
+    "test_expr hellotest_expr hellohello World!".match(regex)?.groups?.hellos
   ).toEqual("hellohello");
   expect("test_expr hello World?").not.toMatch(regex);
   //

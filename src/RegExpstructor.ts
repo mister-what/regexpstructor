@@ -1,5 +1,3 @@
-import { pipe } from "fast-fp.macro";
-
 import {
   addFlags,
   alt,
@@ -48,29 +46,9 @@ interface RootNode<T> {
   flags?: string;
 }
 
-const flatten = <Args extends any[]>(...args: Args) => args.flat(Infinity);
-
-const _makeRanges = (flatRanges: string[]): [string, string][] => {
-  const rangePairs = new Array(flatRanges.length / 2);
-  for (let i = 0, j = 0; i < flatRanges.length; i += 2, j += 1) {
-    rangePairs[j] = [
-      flatRanges[i]?.toString?.(),
-      flatRanges[i + 1]?.toString?.(),
-    ];
-  }
-  return rangePairs;
-};
-
-const makeRanges = pipe(
-  flatten,
-  (flatRanges: string[]) =>
-    flatRanges.length % 2 === 0 ? flatRanges : flatRanges.slice(0, -1),
-  _makeRanges
-);
-
 const EXISTING_INSTANCES_KEY = "$7a3afcebc18ce55fe6f8445324d27b6e$";
 
-const existingClasses: typeof RegExpstructor[] =
+const existingClasses: (typeof RegExpstructor)[] =
   // @ts-ignore
   RegExp.prototype[Symbol.for(EXISTING_INSTANCES_KEY)] || [];
 
@@ -458,7 +436,7 @@ class RegExpstructor {
   /**
    * @description Match any character in these ranges
    * @example RegExpstructor.empty.charOfRanges(["a","z"], ["0", "9"]) // [a-z0-9]
-   * @param {...([string, string])} characterRanges total number of elements must be event
+   * @param {...([string, string])} characterRanges total number of elements must be even
    *
    *
    */
@@ -466,7 +444,7 @@ class RegExpstructor {
     return RegExpstructor.from(
       setNode(
         this.#rootNode,
-        ranges(getNode(this.#rootNode), makeRanges(characterRanges), false)
+        ranges(getNode(this.#rootNode), characterRanges, false)
       )
     );
   }
@@ -474,7 +452,7 @@ class RegExpstructor {
   /**
    * @description Match any character that is not in these ranges
    * @example RegExpstructor.empty.charNotOfRanges(["a","z"], ["0", "9"]) // [^a-z0-9]
-   * @param {...([string, string])} characterRanges total number of elements must be event
+   * @param {...([string, string])} characterRanges total number of elements must be even
    *
    *
    */
@@ -482,7 +460,7 @@ class RegExpstructor {
     return RegExpstructor.from(
       setNode(
         this.#rootNode,
-        ranges(getNode(this.#rootNode), makeRanges(characterRanges), true)
+        ranges(getNode(this.#rootNode), characterRanges, true)
       )
     );
   }
