@@ -1,3 +1,10 @@
+## [2.0.1](https://github.com/mister-what/regexpstructor/compare/v2.0.0...v2.0.1) (2023-03-01)
+
+
+### Bug Fixes
+
+* **package.json:** change homepage url ([d4de787](https://github.com/mister-what/regexpstructor/commit/d4de787e1170b1a1b1e9d1c9c0c36342ea9ee08f))
+
 # [2.0.0](https://github.com/mister-what/regexpstructor/compare/v1.2.2...v2.0.0) (2023-03-01)
 
 
