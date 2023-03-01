@@ -1,3 +1,15 @@
+# [2.0.0](https://github.com/mister-what/regexpstructor/compare/v1.2.2...v2.0.0) (2023-03-01)
+
+
+### Features
+
+* add NodeNext module resolution compatibility ([06851f2](https://github.com/mister-what/regexpstructor/commit/06851f2f7278c7b12e3543c04d83f96d98b5551c))
+
+
+### BREAKING CHANGES
+
+* Dropped support for node versions < 12
+
 ## [1.2.2](https://github.com/mister-what/regexpstructor/compare/v1.2.1...v1.2.2) (2021-12-02)
 
 
