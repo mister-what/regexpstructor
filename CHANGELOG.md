@@ -1,3 +1,10 @@
+## [2.0.2](https://github.com/mister-what/regexpstructor/compare/v2.0.1...v2.0.2) (2023-03-01)
+
+
+### Bug Fixes
+
+* **package.json:** add README.md to package.json ([0ec8073](https://github.com/mister-what/regexpstructor/commit/0ec8073b2cbc851887dff982ef7ef770feab92d6))
+
 ## [2.0.1](https://github.com/mister-what/regexpstructor/compare/v2.0.0...v2.0.1) (2023-03-01)
 
 
