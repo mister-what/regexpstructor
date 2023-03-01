@@ -25,7 +25,8 @@
   },
   "files": [
     "dist",
-    "types"
+    "types",
+    "README.md"
   ],
   "repository": {
     "type": "git",
